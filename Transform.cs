@@ -157,13 +157,60 @@ namespace SharpGL
 		}
 	}
 
-	public class Transform
+	public class Transform : Component
 	{
+		public Transform Parent
+		{
+			get
+			{
+				if (GameObject != null)
+					if (GameObject.Parent != null)
+						if (GameObject.Parent.Transform != null)
+							return GameObject.Parent.Transform;
+				return null;
+			}
+		}
 		public static float PI = (float)Math.PI;
-		public virtual Vector3 Position { get; set; }
-		public virtual Vector3 Scale { get; set; }
+		public virtual Vector3 LocalPosition { get; set; }
+		public virtual Vector3 Position
+		{
+			get
+			{
+				Transform p;
+				if (TryGetParent(out p))
+				{
+					return Vector3.Add(p.Position, LocalPosition);
+				}
+				return LocalPosition;
+			}
+		}
+		public virtual Vector3 LocalScale { get; set; }
+		public virtual Vector3 Scale
+		{
+			get
+			{
+				Transform p;
+				if(TryGetParent(out p))
+				{
+					return Vector3.Multiply(p.Scale, LocalScale);
+				}
+				return LocalScale;
+			}
+		}
 		private Quaternion _rotation;
 		public virtual Quaternion Rotation
+		{
+			get
+			{
+				Transform p;
+				if (TryGetParent(out p))
+				{
+					return Quaternion.Multiply(p.Rotation, LocalRotation);
+				}
+				return LocalRotation;
+			}
+		}
+		public virtual Quaternion LocalRotation
 		{
 			get
 			{
@@ -201,24 +248,36 @@ namespace SharpGL
 		{
 			get
 			{
-				return Rotation.ToEuler();
+				return LocalRotation.ToEuler();
 			}
 		}
-		public Transform()
+		internal override void Init()
 		{
-			Position = Vector3.Zero;
-			Rotation = Quaternion.Identity;
-			Scale = Vector3.One;
+			LocalPosition = Vector3.Zero;
+			LocalRotation = Quaternion.Identity;
+			LocalScale = Vector3.One;
 		}
 		public Vector3 RotateBy(Vector3 inVec)
 		{
-			return Vector3.Transform(inVec, Rotation.Inverted());
+			return Vector3.Transform(inVec, LocalRotation.Inverted());
+		}
+		public bool TryGetParent(out Transform parent)
+		{
+			parent = Parent;
+			return parent != null;
+		}
+		public virtual Matrix4 GetLocalMatrix()
+		{
+			Matrix4 translation = Matrix4.CreateTranslation(LocalPosition);
+			Matrix4 rotation = Matrix4.CreateFromQuaternion(LocalRotation);
+			Matrix4 scale = Matrix4.CreateScale(LocalScale);
+			return scale * translation * rotation;
 		}
 		public virtual Matrix4 GetMatrix()
 		{
 			Matrix4 translation = Matrix4.CreateTranslation(Position);
 			Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
-			Matrix4 scale = Matrix4.CreateScale(Scale);
+			Matrix4 scale = Matrix4.CreateScale(LocalScale);
 			return scale * translation * rotation;
 		}
 		public virtual Matrix4 GetViewMatrix()
@@ -229,15 +288,15 @@ namespace SharpGL
 		}
 		public virtual void Translate(Vector3 amount)
 		{
-			Position += amount;
+			LocalPosition += amount;
 		}
 		public virtual void TranslateLocal(Vector3 amount)
 		{
-			Position += Vector3.Transform(amount, Rotation);
+			LocalPosition += Vector3.Transform(amount, LocalRotation);
 		}
 		public virtual void Rotate(Vector3 axis, float angle)
 		{
-			Rotation *= Quaternion.FromAxisAngle(axis, angle);
+			LocalRotation *= Quaternion.FromAxisAngle(axis, angle);
 		}
 	}
 }

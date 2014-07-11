@@ -11,7 +11,8 @@ namespace SharpGL.Components
 {
 	public class MeshRenderer : Component
 	{
-		private VertexObjectDrawHint[] drawHints;
+		public virtual Mesh Mesh { get; set; }
+		
 		public PrimitiveType PrimitiveType { get; set; }
 		public int Components { get; private set; }
 		public Shader Shader { get; set; }
@@ -27,12 +28,11 @@ namespace SharpGL.Components
 					{
 						if (GameObject.App.ActiveCamera != null)
 						{
-							MeshComponent m = GameObject.Component<MeshComponent>();
-							if (m != null && drawHints != null)
+							if (Mesh != null)
 							{
-								if (m.Mesh != null)
+								if (Mesh.HasDrawHints)
 								{
-									if (m.Mesh.VerticeComponentCount > 0)
+									if (Mesh.VerticeComponentCount > 0)
 									{
 										return true;
 									}
@@ -44,21 +44,7 @@ namespace SharpGL.Components
 				return false;
 			}
 		}
-		public MeshRenderer(GameObject parent) : base	(parent)
-		{
-
-		}
-		public void SetDrawHints(params VertexObjectDrawHint[] drawHints)
-		{
-			
-			this.drawHints = drawHints;
-			Stride = 0;
-			foreach (var dh in drawHints)
-			{
-				if (dh.stride > Stride)
-					Stride = dh.stride;
-			}
-		}
+		
 		internal override void Init()
 		{
 			VAO = GL.GenVertexArray();
@@ -67,26 +53,24 @@ namespace SharpGL.Components
 		{
 			if(CanRender)
 			{
-				MeshComponent m = GameObject.Component<MeshComponent>();
-				int elementCount = m.Mesh.GetElementCount(Stride);
+
+				int elementCount = Mesh.ElementCount;
 				if (elementCount > 0)
 				{
-					GL.BindBuffer(BufferTarget.ArrayBuffer, m.Mesh.VBO);
+					GL.BindBuffer(BufferTarget.ArrayBuffer, Mesh.VBO);
 					GL.BindVertexArray(VAO);
-					if (m.Mesh.VEO > 0)
-						GL.BindBuffer(BufferTarget.ElementArrayBuffer, m.Mesh.VEO);
+					if (Mesh.VEO > 0)
+						GL.BindBuffer(BufferTarget.ElementArrayBuffer, Mesh.VEO);
 
 					if (Shader != null)
 					{
 						Shader.Use();
 						//default shader vars
 						Shader.SetUniform<float>("_time", new float[] { time });
-						Shader.SetUniform<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(m.Transform));
-
-						Shader.SetVertexAttributes(drawHints);
-
+						Shader.SetUniform<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
+						Mesh.ApplyDrawHints(Shader);
 					}
-					if (m.Mesh.VEO > 0)
+					if (Mesh.VEO > 0)
 						GL.DrawElements(PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
 					else
 						GL.DrawArrays(PrimitiveType, 0, elementCount);

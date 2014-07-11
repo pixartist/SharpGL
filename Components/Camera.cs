@@ -61,15 +61,11 @@ namespace SharpGL.Components
 		{
 			get
 			{
-				float w = 2 * Mathf.Tan(fov / 2) * ZNear;
+				float w = 3.4f * Mathf.Tan(Mathf.Deg2Rad(Fov) / 2) * ZNear;
 				return new Vector2(w, w / AspectRatio);
 			}
 		}
 		public float AspectRatio { get; private set; }
-		public Camera(GameObject parent) : base	(parent)
-		{
-
-		}
 		internal override void Init()
 		{
 			RotationTarget = Quaternion.Identity;
@@ -85,20 +81,22 @@ namespace SharpGL.Components
 		}
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
+			Matrix4 t = Matrix4.CreateTranslation(model.Position - Transform.Position);
+			Matrix4 r = Matrix4.CreateFromQuaternion(Transform.Rotation * model.Rotation.Inverted());
 			Matrix4 m = model.GetMatrix();
 			Matrix4 v = Transform.GetViewMatrix();
 			Matrix4 p = projectionMatrix;
 
 			//p.Transpose();
-			return m * v * p;
+			return t * r * p;
 		}
 		public void Update(float tDelta)
 		{
 			if(LerpTranslation)
-				Transform.Position += (PositionTarget - Transform.Position) * TransAccel * tDelta;
+				Transform.LocalPosition += (PositionTarget - Transform.LocalPosition) * TransAccel * tDelta;
 			if (LerpRotation)
 			{
-				Transform.Rotation = Quaternion.Slerp(Transform.Rotation, RotationTarget, RotAccel * tDelta);
+				Transform.LocalRotation = Quaternion.Slerp(Transform.LocalRotation, RotationTarget, RotAccel * tDelta);
 				
 			}
 		}
@@ -188,7 +186,7 @@ namespace SharpGL.Components
 			screen.Y /= ss.Y;
 			screen -= new Vector2(0.5f, -0.5f);
 			screen.Y /= AspectRatio;
-			screen *= 2 * Mathf.Tan(fov / 2) * ZNear;
+			screen *= NearplaneSize.X;
 			//screen.Y /= AspectRatio;
 			//screen *= Mathf.Deg2Rad(Fov);
 			//screen.Y /= AspectRatio;
@@ -213,7 +211,7 @@ namespace SharpGL.Components
 		}
 		public Vector3 ScreenToWorld(Vector2 screen)
 		{
-			return GameObject.Transform.Position + ScreenToDirection(screen);
+			return GameObject.Transform.LocalPosition + ScreenToDirection(screen);
 		}
 	}
 }

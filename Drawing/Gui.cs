@@ -7,36 +7,12 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using SharpGL.Components;
+using SharpGL.Factories;
 namespace SharpGL.Drawing
 {
-	class Gui : Component
+	public class Gui : MeshRenderer
 {
-		private Mesh mesh;
 		public float CameraDistance { get; set; }
-		private VertexObjectDrawHint[] drawHints;
-		public bool CanRender
-		{
-			get
-			{
-				if (GameObject != null)
-				{
-					if (GameObject.App != null)
-					{
-						if (GameObject.App.ActiveCamera != null && mesh != null && drawHints != null)
-						{
-							return true;
-						}
-					}
-				}
-				return false;
-			}
-		}
-		internal Gui(GameObject parent)
-			: base(parent)
-		{
-			drawHints = new VertexObjectDrawHint[1];
-			drawHints[0] = new VertexObjectDrawHint("pos", 3, 3, 0);
-		}
 		internal override void Init()
 		{
 			base.Init();
@@ -48,7 +24,9 @@ namespace SharpGL.Drawing
 			if (TryGetActiveCamera(out cam))
 			{
 				Vector2 s = cam.NearplaneSize;
-				mesh = PrimitiveFactory.CreatePlane(s.X / -2, s.Y / -2, s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
+				Mesh = PrimitiveFactory.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.1f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
+				Shader = GameObject.App.Shaders["default"];
+				PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 			}
 		}
 		internal override void Render(float dT)

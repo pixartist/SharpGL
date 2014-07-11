@@ -8,7 +8,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using SharpGL.Components;
 using SharpGL.Drawing;
-namespace SharpGL
+namespace SharpGL.Factories
 {
 	public class GameObjectFactory
 	{
@@ -20,27 +20,35 @@ namespace SharpGL
 		public GameObject CreateCube(Vector3 position, Vector3 scale, Vector3 size)
 		{
 			GameObject result = App.CreateGameObject("Cube");
-			result.Transform.Position = position;
-			result.Transform.Scale = scale;
-			MeshComponent mc = result.AddComponent<MeshComponent>();
-			mc.Mesh = PrimitiveFactory.CreateCube(size);
+			result.Transform.LocalPosition = position;
+			result.Transform.LocalScale = scale;
+			
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
+			r.Mesh = PrimitiveFactory.CreateCube(size);
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Shader = App.Shaders["default"];
-			r.SetDrawHints(new VertexObjectDrawHint("pos",3,6,0), new VertexObjectDrawHint("color", 3, 6, 3));
 			return result;
 		}
 		public GameObject CreateCube(Vector3 position, Vector3 scale)
 		{
 			GameObject result = App.CreateGameObject("Cube");
-			result.Transform.Position = position;
-			result.Transform.Scale = scale;
-			MeshComponent mc = result.AddComponent<MeshComponent>();
-			mc.Mesh = PrimitiveFactory.CreateCube(new Vector3(1,1,1));
+			result.Transform.LocalPosition = position;
+			result.Transform.LocalScale = scale;
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
+			r.Mesh = PrimitiveFactory.CreateCube(new Vector3(1,1,1));
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Shader = App.Shaders["default"];
-			r.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0), new VertexObjectDrawHint("color", 3, 6, 3));
+			return result;
+		}
+		public GameObject CreatePlane(Vector3 scale, Vector3 position)
+		{
+			GameObject result = App.CreateGameObject("Plane");
+			result.Transform.LocalPosition = position;
+			result.Transform.LocalScale = scale;
+			MeshRenderer r = result.AddComponent<MeshRenderer>();
+			r.Mesh = PrimitiveFactory.CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
+			r.PrimitiveType = PrimitiveType.Triangles;
+			r.Shader = App.Shaders["default"];
 			return result;
 		}
 	}

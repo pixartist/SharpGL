@@ -8,13 +8,13 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using SharpGL.Components;
 using SharpGL.Drawing;
-namespace SharpGL
+namespace SharpGL.Factories
 {
 	class PrimitiveFactory
 	{
 		public static Mesh CreateCube(Vector3 size)
 		{
-			Mesh m = new Mesh();
+			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
 				        0,         0,         0, 1.0f,1.0f,1.0f, //0
 				 + size.X,         0,         0, 0.0f,1.0f,1.0f, //1
@@ -25,7 +25,7 @@ namespace SharpGL
 				        0,  + size.Y,  + size.Z, 0.0f,1.0f,0.0f, //6
 				 + size.X,  + size.Y,  + size.Z, 0.0f,0.0f,0.0f  //7
 			};
-			m.SetVertices(vertices);
+			mesh.SetVertices(vertices);
 			uint[] indices = new uint[] {
 				0,2,1,1,2,3, //front
 				6,4,7,7,4,5, //back
@@ -34,31 +34,18 @@ namespace SharpGL
 				0,4,2,2,4,6, //left
 				5,1,7,7,1,3 //right
 			};
-			m.SetIndices(indices);
-			return m;
-		}
-		public static Mesh CreatePlane(int verticeX, int verticeZ)
-		{
-			return CreatePlane(0, 0, 1, 1, verticeX, verticeZ, Quaternion.Identity);
-		}
-		public static Mesh CreatePlane(int verticeX, int verticeZ, Quaternion rotation)
-		{
-			return CreatePlane(0, 0, 1, 1, verticeX, verticeZ, rotation);
-		}
-		public static Mesh CreatePlane(float x, float y, int verticeX, int verticeZ)
-		{
-			return CreatePlane(x, y, 1, 1, verticeX, verticeZ, Quaternion.Identity);
-		}
-		public static Mesh CreatePlane(float x, float y, int verticeX, int verticeZ, Quaternion rotation)
-		{
-			return CreatePlane(x, y, 1, 1, verticeX, verticeZ, rotation);
+			mesh.SetIndices(indices);
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0), new VertexObjectDrawHint("color", 3, 6, 3));
+			return mesh;
 		}
 		
-		public static Mesh CreatePlane(float x, float y, float width, float depth, int verticeX, int verticeZ, Quaternion rotation)
+		public static Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
 		{
+			int verticeX = segmentsX + 1;
+			int verticeZ = segmentsZ + 1;
 			float sx = 1f/verticeX;
 			float sz = 1f/verticeZ;
-			float[] vertices = new float[verticeX * verticeZ * 3];
+			float[] vertices = new float[verticeX * verticeZ * 6];
 			uint index;
 			Vector3 tmp;
 			Mesh mesh = new Mesh();
@@ -66,21 +53,26 @@ namespace SharpGL
 			{
 				for(int iz = 0; iz < verticeZ; iz++)
 				{
-					index = (uint)(ix * verticeZ + iz) * 3;
-					tmp = new Vector3(x + width * sx * ix, 0, y + depth * sz * iz);
+					index = (uint)(ix * verticeZ + iz) * 6;
+					tmp = new Vector3(x + width * sx * ix * 2, 0, y + depth * sz * iz * 2);
 					tmp = Vector3.Transform(tmp, rotation);
+					tmp += Vector3.Transform(Vector3.UnitY, rotation) * z ;
 					vertices[index] = tmp.X;
 					vertices[index + 1] = tmp.Y;
-					vertices[index + 1] = tmp.Z;
+					vertices[index + 2] = tmp.Z;
+					vertices[index + 3] = 1f;
+					vertices[index + 4] = 1f;
+					vertices[index + 5] = 1f;
 				}
+				
 			}
-			uint[] indices = new uint[(verticeX - 1) * (verticeZ - 1) * 6];
+			uint[] indices = new uint[(segmentsX) * (segmentsZ) * 6];
 			uint vIndex;
-			for (uint ix = 0; ix < verticeX - 1; ix++)
+			for (uint ix = 0; ix < segmentsX; ix++)
 			{
-				for (uint iz = 0; iz < verticeZ - 1; iz++)
+				for (uint iz = 0; iz < segmentsZ; iz++)
 				{
-					index = (uint)(ix * (verticeZ - 1) + iz) * 6;
+					index = (uint)(ix * segmentsZ + iz) * 6;
 					vIndex = (uint)((ix * verticeZ + iz) * 3);
 					indices[index] = vIndex;
 					indices[index + 1] = vIndex + 1;
@@ -92,6 +84,7 @@ namespace SharpGL
 			}
 			mesh.SetVertices(vertices);
 			mesh.SetIndices(indices);
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0), new VertexObjectDrawHint("color", 3, 6, 3));
 			return mesh;
 		}
 	}

@@ -9,7 +9,13 @@ namespace SharpGL
 	public class GameObject
 	{
 		public App App { get; private set; }
-		public Transform Transform { get; private set; }
+		public Transform Transform
+		{
+			get
+			{
+				return Component<Transform>();
+			}
+		}
 		public string Name { get; set; }
 		public GameObject Parent { get; private set; }
 		private List<GameObject> children;
@@ -20,7 +26,7 @@ namespace SharpGL
 			Name = name;
 			children = new List<GameObject>();
 			components = new Dictionary<Type, Component>();
-			Transform = new Transform();
+			AddComponent<Transform>();
 		}
 		internal void Render(float dTime)
 		{
@@ -38,8 +44,9 @@ namespace SharpGL
 			Type t = typeof(T);
 			if (components.ContainsKey(t))
 				throw (new InvalidOperationException("A component of this type already exists."));
-			Component c = (Component)Activator.CreateInstance(t, this);
+			Component c = (Component)Activator.CreateInstance(t);
 			components.Add(t, c);
+			c.GameObject = this;
 			c.Init();
 			return (T)c;
 		}

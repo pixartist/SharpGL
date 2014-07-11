@@ -8,7 +8,7 @@ namespace SharpGL.Components
 {
 	public abstract class Component
 	{
-		public GameObject GameObject { get; private set; }
+		public GameObject GameObject { get; internal set; }
 		public Transform Transform
 		{
 			get
@@ -18,10 +18,9 @@ namespace SharpGL.Components
 				return null;
 			}
 		}
-		public Component(GameObject parent)
+		protected Component()
 		{
-			GameObject = parent;
-			Init();
+
 		}
 		public virtual void Destroy()
 		{

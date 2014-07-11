@@ -11,25 +11,55 @@ namespace SharpGL.Drawing
 {
 	public class Mesh
 	{
+		private VertexObjectDrawHint[] drawHints;
 		public int VerticeComponentCount { get; private set; }
 		public int IndexCount { get; private set; }
 		public int VBO { get; private set; }
 		public int VEO { get; private set; }
-		public int GetElementCount(int stride)
+		public int Stride { get; private set; }
+		public bool HasDrawHints
 		{
-			if (VEO > 0)
+			get
 			{
-				return IndexCount;
+				if (drawHints != null)
+					if (drawHints.Length > 0)
+						return true;
+				return false;
 			}
-			else
+		}
+		public int ElementCount
+		{
+			get
 			{
-				return VerticeComponentCount / stride;
+				if (VEO > 0)
+				{
+					return IndexCount;
+				}
+				else
+				{
+					return VerticeComponentCount / Stride;
+				}
 			}
 		}
 		public Mesh()
 		{
 			VBO = -1;
 			VEO = -1;
+		}
+		public void SetDrawHints(params VertexObjectDrawHint[] drawHints)
+		{
+
+			this.drawHints = drawHints;
+			Stride = 0;
+			foreach (var dh in drawHints)
+			{
+				if (dh.stride > Stride)
+					Stride = dh.stride;
+			}
+		}
+		public void ApplyDrawHints(Shader shader)
+		{
+			shader.SetVertexAttributes(drawHints);
 		}
 		public void SetVertices(float[] vertices)
 		{

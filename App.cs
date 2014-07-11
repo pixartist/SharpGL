@@ -11,6 +11,7 @@ using System.Drawing;
 using SharpGL.Drawing;
 using SharpGL.Input;
 using SharpGL.Components;
+using SharpGL.Factories;
 namespace SharpGL
 {
 	public class App
@@ -52,8 +53,6 @@ namespace SharpGL
 			CameraContainer = CreateGameObject("Camera");
 			ActiveCamera = CameraContainer.AddComponent<Camera>();
 			ActiveCamera.TransAccel = 4f;
-			ActiveCamera.Transform.Position = new Vector3(0, 0, 10);
-			ActiveCamera.PositionTarget = ActiveCamera.Transform.Position;
 			stopWatch = new System.Diagnostics.Stopwatch();
 			stopWatch.Start();
 			time = new System.Diagnostics.Stopwatch();
