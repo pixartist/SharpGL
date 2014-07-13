@@ -6,11 +6,36 @@ using System.Threading.Tasks;
 using OpenTK;
 using SharpGL.Drawing;
 using SharpGL.Components;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Components
 {
 	public class Camera : Component
 	{
-		private Matrix4 projectionMatrix;
+		private bool beganDraw;
+		private float zNear;
+		private float zFar;
+		private float fov;
+		protected Matrix4 projectionMatrix;
+		public Material bufferMaterial;
+		private Mesh screenMesh;
+		private Shader cameraShader;
+		public int VAO { get; private set; }
+
+		public Shader CameraShader
+		{
+			get
+			{
+				if (bufferMaterial == null)
+					return null;
+				else
+					return bufferMaterial.Shader;
+			}
+			set 
+			{
+				SetupScreenShader(value);
+			}
+		}
 		public Vector3 PositionTarget { get; set; }
 		public Quaternion RotationTarget { get; set; }
 		public float TransAccel { get; set; }
@@ -18,7 +43,8 @@ namespace SharpGL.Components
 		public bool LerpRotation { get; set; }
 		public bool LerpTranslation { get; set; }
 		public bool PitchLock { get; set; }
-		private float zNear;
+		
+		
 		public float ZNear
 		{
 			get
@@ -31,7 +57,7 @@ namespace SharpGL.Components
 				SetupProjection();
 			}
 		}
-		private float zFar;
+		
 		public float ZFar
 		{
 			get
@@ -44,7 +70,7 @@ namespace SharpGL.Components
 				SetupProjection();
 			}
 		}
-		private float fov;
+		
 		public float Fov
 		{
 			get
@@ -61,8 +87,8 @@ namespace SharpGL.Components
 		{
 			get
 			{
-				float w = 3.4f * Mathf.Tan(Mathf.Deg2Rad(Fov) / 2) * ZNear;
-				return new Vector2(w, w / AspectRatio);
+				float h = 2 * Mathf.Tan(Mathf.Deg2Rad(Fov) / 2) * ZNear;
+				return new Vector2(h * AspectRatio, h);
 			}
 		}
 		public float AspectRatio { get; private set; }
@@ -77,14 +103,27 @@ namespace SharpGL.Components
 			fov = 90;
 			zNear = 1.0f;
 			zFar = 120f;
+			screenMesh = new Mesh();
+			screenMesh.SetVertices(new float[] {
+				-1,-1,
+				1,-1,
+				1,1,
+				-1,1
+			});
+			screenMesh.SetIndices(new uint[] {
+				2,3,0,
+				0,1,2
+			});
+			screenMesh.SetDrawHints(new VertexObjectDrawHint("pos", 2, 2, 0));
+			VAO = GL.GenVertexArray();
 			SetupProjection();
 		}
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
 			Matrix4 t = Matrix4.CreateTranslation(model.Position - Transform.Position);
 			Matrix4 r = Matrix4.CreateFromQuaternion(Transform.Rotation * model.Rotation.Inverted());
-			Matrix4 m = model.GetMatrix();
-			Matrix4 v = Transform.GetViewMatrix();
+			if (float.IsNaN(r.M11))
+				r = Matrix4.Identity;
 			Matrix4 p = projectionMatrix;
 
 			//p.Transpose();
@@ -162,21 +201,66 @@ namespace SharpGL.Components
 					Transform.Rotate(Transform.Right, delta * sign);
 			}
 		}
+		private void SetupScreenShader(Shader shader)
+		{
+			if (shader == null)
+			{
+				bufferMaterial.Dispose();
+				bufferMaterial = null;
+
+			}
+			else
+			{
+				Surface bufferSurface = new Surface();
+				bufferSurface.Create(GameObject.App.Window.Width, GameObject.App.Window.Height, new Surface.SurfaceFormat { DepthBuffer = true, WrapMode = TextureWrapMode.Clamp});
+				bufferMaterial = new Material(shader, new Material.Texture("tex", bufferSurface));
+			}
+		}
 		private void SetupProjection()
 		{
 			if(GameObject != null)
 			{
 				AspectRatio = GameObject.App.Window.Width / (float)GameObject.App.Window.Height;
 				projectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)((Math.PI * Fov) / 180), AspectRatio, ZNear, ZFar);
-				
+			}
+		}
+		public void BeginDraw()
+		{
+			if(bufferMaterial != null)
+			{
+				bufferMaterial.Textures[0].Surface.Clear();
+				bufferMaterial.Textures[0].Surface.BindFramebuffer();
+				beganDraw = true;
+			}
+		}
+		public void EndDraw()
+		{
+			if (beganDraw)
+			{
+				beganDraw = false;
+				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+				if (bufferMaterial != null)
+				{
+					GL.BindBuffer(BufferTarget.ArrayBuffer, screenMesh.VBO);
+					GL.BindVertexArray(VAO);
+					GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenMesh.VEO);
+					bufferMaterial.Use();
+					screenMesh.ApplyDrawHints(bufferMaterial.Shader);
+					GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+					GL.BindVertexArray(0);
+					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+					GL.UseProgram(0);
+				}
 			}
 		}
 		public Vector2 WorldToScreen(Vector3 world)
 		{
-			Vector3 tmp = Vector3.Transform(world, (GameObject.Transform.GetMatrix() * projectionMatrix));
+			/*Vector3 tmp = Vector3.Transform(world, (GameObject.Transform.GetMatrix() * projectionMatrix));
 			tmp.X = (tmp.X + 1) * 0.5f * GameObject.App.Window.Width;
 			tmp.Y = (1 - tmp.Y) * 0.5f * GameObject.App.Window.Height;
-			return new Vector2(tmp.X, tmp.Y);
+			return new Vector2(tmp.X, tmp.Y);*/
+			throw (new NotImplementedException());
 		}
 		
 		public Vector3 ScreenToDirection(Vector2 screen)

@@ -48,12 +48,13 @@ namespace SharpGL.Components
 		internal override void Init()
 		{
 			VAO = GL.GenVertexArray();
+			Shader = GameObject.App.Shaders["default"];
+			PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 		}
 		internal override void Render(float time)
 		{
 			if(CanRender)
 			{
-
 				int elementCount = Mesh.ElementCount;
 				if (elementCount > 0)
 				{
@@ -64,10 +65,12 @@ namespace SharpGL.Components
 
 					if (Shader != null)
 					{
+
+						Shader.SetUniform("_time", time);
+						Shader.SetUniform<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
 						Shader.Use();
 						//default shader vars
-						Shader.SetUniform<float>("_time", new float[] { time });
-						Shader.SetUniform<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
+						
 						Mesh.ApplyDrawHints(Shader);
 					}
 					if (Mesh.VEO > 0)

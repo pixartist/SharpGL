@@ -266,7 +266,7 @@ namespace SharpGL
 			parent = Parent;
 			return parent != null;
 		}
-		public virtual Matrix4 GetLocalMatrix()
+		/*public virtual Matrix4 GetLocalMatrix()
 		{
 			Matrix4 translation = Matrix4.CreateTranslation(LocalPosition);
 			Matrix4 rotation = Matrix4.CreateFromQuaternion(LocalRotation);
@@ -285,7 +285,7 @@ namespace SharpGL
 			Matrix4 translation = Matrix4.CreateTranslation(-Position);
 			Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
 			return translation * rotation;
-		}
+		}*/
 		public virtual void Translate(Vector3 amount)
 		{
 			LocalPosition += amount;

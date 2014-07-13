@@ -84,7 +84,7 @@ namespace SharpGL.Drawing
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, fboHandle);
             GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, textureHandle, 0);
             if(format.DepthBuffer)
-                GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt, RenderbufferTarget.RenderbufferExt, dbHandle);
+                GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, dbHandle);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             Log.Error("Created Framebuffer: " + GL.GetError());
             
@@ -165,13 +165,12 @@ namespace SharpGL.Drawing
         public void BindFramebuffer()
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, fboHandle);
-            
         }
         public void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f)
         {
             BindFramebuffer();
             GL.ClearColor(r,g,b,a);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
         public void Dispose()

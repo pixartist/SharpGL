@@ -17,7 +17,8 @@ namespace SharpGL
 	public class App
 	{
 		public Dictionary<string, Shader> Shaders;
-		public GameObjectFactory Factory { get; protected set; }
+		public GameObjectFactory GameObjectFactory { get; protected set; }
+		public PrimitiveFactory PrimitiveFactory { get; protected set; }
 		private Dictionary<string, GameObject> GameObjects;
 		
 		private System.Diagnostics.Stopwatch stopWatch;
@@ -58,8 +59,16 @@ namespace SharpGL
 			time = new System.Diagnostics.Stopwatch();
 			time.Start();
 
-			Shaders.Add("default", new Shader("Shaders/Default.glsl", "vertex", null, "fragment"));
-			Factory = new GameObjectFactory(this);
+			Shaders.Add("default", new Shader("Shaders/default.glsl", "vertex", null, "fragment"));
+			Shaders.Add("screen", new Shader("Shaders/default.glsl", "vertexScreen", null, "fragmentScreen"));
+			var ca = new Shader("Shaders/default.glsl", "vertexScreen", null, "fragmentScreenCA");
+			ca.SetUniform("baseBlur", 0.5f);
+			ca.SetUniform("blur",14f);
+			ca.SetUniform("chromatic", 0.1f);
+			Shaders.Add("screenCA", ca);
+
+			GameObjectFactory = new GameObjectFactory(this);
+			PrimitiveFactory = new PrimitiveFactory();
 			Window.Run(60.0);
 			
         }
@@ -80,15 +89,21 @@ namespace SharpGL
         private void OnRenderInternal(object sender, FrameEventArgs e)
         {
             var window = (GameWindow)sender;
+			
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			if(ActiveCamera != null)
+				ActiveCamera.BeginDraw();
 			foreach(var go in GameObjects.Values)
 			{
 				go.Render(Time);
 			}
 			//User drawing
             OnDraw();
+			if (ActiveCamera != null)
+				ActiveCamera.EndDraw();
             window.SwapBuffers();
+			
         }
 		
 		
@@ -121,7 +136,7 @@ namespace SharpGL
 			GL.Enable(EnableCap.DepthTest);
 			GL.DepthMask(true);
 			GL.DepthFunc(DepthFunction.Less);
-			GL.DepthRange(0.0f, 10.0f);
+			GL.DepthRange(0.0f, 1.0f);
 		}
 		private void EnabledTextureBlending()
 		{

@@ -33,10 +33,11 @@ namespace SharpGL
 			foreach (var c in components.Values)
 				c.Render(dTime);
 		}
-		public void AddChild(GameObject child)
+		public GameObject AddChild(GameObject child)
 		{
 			children.Add(child);
 			child.Parent = this;
+			return child;
 		}
 		public T AddComponent<T>() where T : Component
 		{

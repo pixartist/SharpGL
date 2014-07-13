@@ -10,9 +10,9 @@ using SharpGL.Components;
 using SharpGL.Drawing;
 namespace SharpGL.Factories
 {
-	class PrimitiveFactory
+	public class PrimitiveFactory
 	{
-		public static Mesh CreateCube(Vector3 size)
+		public Mesh CreateCube(Vector3 size)
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
@@ -39,7 +39,7 @@ namespace SharpGL.Factories
 			return mesh;
 		}
 		
-		public static Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
+		public Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
 		{
 			int verticeX = segmentsX + 1;
 			int verticeZ = segmentsZ + 1;

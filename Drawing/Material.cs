@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
     public class Material : IDisposable
@@ -58,11 +60,13 @@ namespace SharpGL.Drawing
         }
         public void Use()
         {
+			GL.Enable(EnableCap.Texture2D);
             if(Shader != null)
                 Shader.Use();
             int k = 0;
             foreach (var t in Textures)
             {
+				GL.ActiveTexture(TextureUnit.Texture0 + k);
                 t.Surface.BindTexture(OpenTK.Graphics.OpenGL.TextureUnit.Texture0 + k);
                 if(t.Name != null)
                 {

@@ -24,7 +24,7 @@ namespace SharpGL.Factories
 			result.Transform.LocalScale = scale;
 			
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
-			r.Mesh = PrimitiveFactory.CreateCube(size);
+			r.Mesh = App.PrimitiveFactory.CreateCube(size);
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Shader = App.Shaders["default"];
 			return result;
@@ -35,7 +35,7 @@ namespace SharpGL.Factories
 			result.Transform.LocalPosition = position;
 			result.Transform.LocalScale = scale;
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
-			r.Mesh = PrimitiveFactory.CreateCube(new Vector3(1,1,1));
+			r.Mesh = App.PrimitiveFactory.CreateCube(new Vector3(1,1,1));
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Shader = App.Shaders["default"];
 			return result;
@@ -46,7 +46,7 @@ namespace SharpGL.Factories
 			result.Transform.LocalPosition = position;
 			result.Transform.LocalScale = scale;
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
-			r.Mesh = PrimitiveFactory.CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
+			r.Mesh = App.PrimitiveFactory.CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Shader = App.Shaders["default"];
 			return result;
