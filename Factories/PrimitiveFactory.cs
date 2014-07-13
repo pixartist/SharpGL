@@ -16,15 +16,25 @@ namespace SharpGL.Factories
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
-				        0,         0,         0, 1.0f,1.0f,1.0f, //0
-				 + size.X,         0,         0, 0.0f,1.0f,1.0f, //1
-				        0,  + size.Y,         0, 1.0f,0.0f,1.0f, //2
-				 + size.X,  + size.Y,         0, 1.0f,1.0f,0.0f, //3
-				        0,         0,  + size.Z, 0.0f,0.0f,1.0f, //4
-				 + size.X,         0,  + size.Z, 1.0f,0.0f,0.0f, //5
-				        0,  + size.Y,  + size.Z, 0.0f,1.0f,0.0f, //6
-				 + size.X,  + size.Y,  + size.Z, 0.0f,0.0f,0.0f  //7
+				        0,         0,         0, -1, -1, -1, //0
+				 + size.X,         0,         0,  1, -1, -1, //1
+				        0,  + size.Y,         0, -1,  1, -1, //2
+				 + size.X,  + size.Y,         0,  1,  1, -1, //3
+				        0,         0,  + size.Z, -1, -1,  1, //4
+				 + size.X,         0,  + size.Z,  1, -1,  1, //5
+				        0,  + size.Y,  + size.Z, -1,  1,  1, //6
+				 + size.X,  + size.Y,  + size.Z,  1,  1,  1 //7
 			};
+			/*float[] vertices = new float[] {
+				        0,         0,         0, //0
+				 + size.X,         0,         0, //1
+				        0,  + size.Y,         0, //2
+				 + size.X,  + size.Y,         0, //3
+				        0,         0,  + size.Z, //4
+				 + size.X,         0,  + size.Z, //5
+				        0,  + size.Y,  + size.Z, //6
+				 + size.X,  + size.Y,  + size.Z, //7
+			};*/
 			mesh.SetVertices(vertices);
 			uint[] indices = new uint[] {
 				0,2,1,1,2,3, //front
@@ -35,7 +45,8 @@ namespace SharpGL.Factories
 				5,1,7,7,1,3 //right
 			};
 			mesh.SetIndices(indices);
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0), new VertexObjectDrawHint("color", 3, 6, 3));
+			//mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false));
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false), new VertexObjectDrawHint("normal", 3, 6, 3, true));
 			return mesh;
 		}
 		
@@ -60,9 +71,9 @@ namespace SharpGL.Factories
 					vertices[index] = tmp.X;
 					vertices[index + 1] = tmp.Y;
 					vertices[index + 2] = tmp.Z;
-					vertices[index + 3] = 1f;
-					vertices[index + 4] = 1f;
-					vertices[index + 5] = 1f;
+					vertices[index + 3] = 0;
+					vertices[index + 4] = 1;
+					vertices[index + 5] = 0;
 				}
 				
 			}
@@ -84,7 +95,7 @@ namespace SharpGL.Factories
 			}
 			mesh.SetVertices(vertices);
 			mesh.SetIndices(indices);
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0), new VertexObjectDrawHint("color", 3, 6, 3));
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false), new VertexObjectDrawHint("normal", 3, 6, 3, true));
 			return mesh;
 		}
 	}

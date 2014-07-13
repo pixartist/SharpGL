@@ -12,11 +12,16 @@ namespace SharpGL.Drawing
 	public class Mesh
 	{
 		private VertexObjectDrawHint[] drawHints;
-		public int VerticeComponentCount { get; private set; }
-		public int IndexCount { get; private set; }
+		private float[] vertices;
+		private uint[] indices;
+		public int VertexArrayLength { get; private set; }
+		public int IndexArrayLength { get; private set; }
 		public int VBO { get; private set; }
 		public int VEO { get; private set; }
 		public int Stride { get; private set; }
+		public bool BuffersUpdated { get; private set; }
+		public ShaderParamCollection Parameters { get; private set; }
+		
 		public bool HasDrawHints
 		{
 			get
@@ -33,11 +38,11 @@ namespace SharpGL.Drawing
 			{
 				if (VEO > 0)
 				{
-					return IndexCount;
+					return IndexArrayLength;
 				}
 				else
 				{
-					return VerticeComponentCount / Stride;
+					return VertexArrayLength / Stride;
 				}
 			}
 		}
@@ -45,17 +50,12 @@ namespace SharpGL.Drawing
 		{
 			VBO = -1;
 			VEO = -1;
+			Parameters = new ShaderParamCollection();
 		}
 		public void SetDrawHints(params VertexObjectDrawHint[] drawHints)
 		{
-
 			this.drawHints = drawHints;
-			Stride = 0;
-			foreach (var dh in drawHints)
-			{
-				if (dh.stride > Stride)
-					Stride = dh.stride;
-			}
+			BuffersUpdated = false;
 		}
 		public void ApplyDrawHints(Shader shader)
 		{
@@ -63,41 +63,63 @@ namespace SharpGL.Drawing
 		}
 		public void SetVertices(float[] vertices)
 		{
-			VerticeComponentCount = 0;
-			if (vertices != null)
-			{
-				if(VBO <= 0)
-				{
-					VBO = GL.GenBuffer();
-				}
-				VBO = GL.GenBuffer();
-				GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-				GL.BufferData<float>(BufferTarget.ArrayBuffer, new IntPtr(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
-				VerticeComponentCount = vertices.Length;
-				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-			}
-			else if(VBO > 0)
-			{
-				GL.DeleteBuffer(VBO);
-			}
+			this.vertices = vertices;
+			BuffersUpdated = false;
 		}
 		public void SetIndices(uint[] indices)
 		{
-			IndexCount = -1;
-			if (indices != null)
+			this.indices = indices;
+			BuffersUpdated = false;
+		}
+		public void UpdateBuffers()
+		{
+			if(!BuffersUpdated)
 			{
-				if (VEO <= 0)
+				Stride = -1;
+				VertexArrayLength = -1;
+				IndexArrayLength = -1;
+				foreach (var dh in drawHints)
 				{
-					VEO = GL.GenBuffer();
+					if (dh.stride > Stride)
+						Stride = dh.stride;
 				}
-				GL.BindBuffer(BufferTarget.ElementArrayBuffer, VEO);
-				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
-				IndexCount = indices.Length;
+				
+				if (vertices != null)
+				{
+					if(VBO < 0)
+					{
+						VBO = GL.GenBuffer();
+					}
+					GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
+					GL.BufferData<float>(BufferTarget.ArrayBuffer, new IntPtr(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
+					VertexArrayLength = vertices.Length;
+					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+					if (indices != null)
+					{
+						if (VEO < 0)
+						{
+							VEO = GL.GenBuffer();
+						}
+						GL.BindBuffer(BufferTarget.ElementArrayBuffer, VEO);
+						GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
+						IndexArrayLength = indices.Length;
+					}
+					else if (VEO >= 0)
+					{
+						GL.DeleteBuffer(VEO);
+					}
+				}
+				else if(VBO >= 0)
+				{
+					GL.DeleteBuffer(VBO);
+				}
+				BuffersUpdated = true;
 			}
-			else if (VEO > 0)
-			{
-				GL.DeleteBuffer(VEO);
-			}
+		}
+		public void ApplyParameters(Shader shader)
+		{
+			foreach (var p in Parameters.Paramters.Values)
+				p.Apply(shader);
 		}
 		public void DeleteBuffers()
 		{

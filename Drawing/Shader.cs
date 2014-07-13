@@ -17,25 +17,15 @@ namespace SharpGL.Drawing
 		public int components;
 		public int stride;
 		public int offset;
+		public bool normalize;
 
-		public VertexObjectDrawHint(string attributeName, int components, int stride, int offset)
+		public VertexObjectDrawHint(string attributeName, int components, int stride, int offset, bool normalize)
 		{
 			this.attributeName = attributeName;
 			this.components = components;
 			this.stride = stride;
 			this.offset = offset;
-		}
-	}
-	public class LocationAndData
-	{
-		public int Location { get; private set; }
-		public Type Type { get; private set; }
-		public object Data { get; set; }
-		public LocationAndData(int location, Type type, object data)
-		{
-			this.Location = location;
-			this.Type = type;
-			this.Data = data;
+			this.normalize = normalize;
 		}
 	}
     public class Shader : IDisposable
@@ -48,8 +38,7 @@ namespace SharpGL.Drawing
 		public int LocGeometry { get; private set; }
 		public int LocFragment { get; private set; }
 		public int Program { get; private set; }
-		private Dictionary<string, LocationAndData> uniformData;
-		
+        private Dictionary<string, int> uniformLocations;
 		private Dictionary<string, int> vertexAttributeLocations;
 		private string filePath;
 		public Shader(string filePath, string vertexIdent, string geometryIdent, string fragmentIdent)
@@ -58,7 +47,7 @@ namespace SharpGL.Drawing
             this.vertexIdent = vertexIdent;
 			this.geometryIdent = geometryIdent;
             this.fragmentIdent = fragmentIdent;
-			uniformData = new Dictionary<string, LocationAndData>();
+			uniformLocations = new Dictionary<string, int>();
 			vertexAttributeLocations = new Dictionary<string, int>();
             if(File.Exists(filePath))
             {
@@ -94,7 +83,6 @@ namespace SharpGL.Drawing
         public void Use()
         {
             GL.UseProgram(Program);
-			ApplyUniforms();
         }
 		public void SetVertexAttributes(params VertexObjectDrawHint[] drawHints)
 		{
@@ -107,7 +95,7 @@ namespace SharpGL.Drawing
 					{
 						GL.EnableVertexAttribArray(posAtt);
 						
-						GL.VertexAttribPointer(posAtt, h.components, VertexAttribPointerType.Float, false, h.stride * sizeof(float), h.offset * sizeof(float));
+						GL.VertexAttribPointer(posAtt, h.components, VertexAttribPointerType.Float, h.normalize, h.stride * sizeof(float), h.offset * sizeof(float));
 						//GL.DisableVertexAttribArray(posAtt);
 					}
 				}
@@ -115,69 +103,93 @@ namespace SharpGL.Drawing
 		}
 		public void SetUniform(int location, uint value) 
 		{
-			string name = "_ULoc_" + location;
-			SetUniform(name, value);
+			GL.Uniform1(location, value);
 		}
 		public void SetUniform(int location, float value)
 		{
-			string name = "_ULoc_" + location;
-			SetUniform(name, value);
+			GL.Uniform1(location, value);
 		}
 		public void SetUniform(int location, double value)
 		{
-			string name = "_ULoc_" + location;
-			SetUniform(name, value);
+			GL.Uniform1(location, value);
 		}
-
 		public void SetUniform<T>(string name, params T[] values)
         {
             SetUniform(name, typeof(T), values);
+			
         }
         public void SetUniform(string name, Type type, object values)
         {
-			LocationAndData d;
-			if (!uniformData.TryGetValue(name, out d))
-			{
-				d = new LocationAndData(GL.GetUniformLocation(Program, name), type, values);
-				if (d.Location >= 0)
+            if (type == typeof(float))
+            {
+                float[] data = (float[])values;
+				switch (data.Length)
 				{
-					uniformData.Add(name, d);
+					case 0:
+						break;
+					case 1:
+						GL.Uniform1(GetUniformLoc(name), data[0]);
+						break;
+					case 2:
+						GL.Uniform2(GetUniformLoc(name), 1, data);
+						break;
+					case 3:
+						GL.Uniform3(GetUniformLoc(name), 1, data);
+						break;
+					case 4:
+						GL.Uniform4(GetUniformLoc(name), 1, data);
+						break;
+					default:
+						throw (new Exception("Only a maximum of four values can be passed to a uniform"));
 				}
-			}
-			else
+            }
+            else if (type == typeof(int))
+            {
+                int[] data = (int[])values;
+				switch (data.Length)
+				{
+					case 0:
+						break;
+					case 1:
+						GL.Uniform1(GetUniformLoc(name), data[0]);
+						break;
+					case 2:
+						GL.Uniform2(GetUniformLoc(name), 2, data);
+						break;
+					case 3:
+						GL.Uniform2(GetUniformLoc(name), 3, data);
+						break;
+					case 4:
+						GL.Uniform2(GetUniformLoc(name), 4, data);
+						break;
+					default:
+						throw (new Exception("Only a maximum of four values can be passed to a uniform"));
+				}
+            }
+			else if(type == typeof(Matrix4))
 			{
-				d.Data = values;
+				Matrix4[] data = (Matrix4[])values;
+				GL.UniformMatrix4(GetUniformLoc(name), false, ref data[0]);
 			}
+            else
+                throw (new NotImplementedException("type " + type + " not supported"));
         }
-		private void ApplyUniforms()
+		private void ApplyMultiUniform<T>(int location, int length, T[] data)
 		{
-			foreach (var u in uniformData.Values)
-			{
-				if (u.Type == typeof(float))
-				{
-					float[] data = (float[])u.Data;
-					GL.Uniform1(u.Location, data.Length, data);
-				}
-				else if (u.Type == typeof(int))
-				{
-					int[] data = (int[])u.Data;
-					GL.Uniform1(u.Location, data.Length, data);
-				}
-				else if (u.Type == typeof(uint))
-				{
-					uint[] data = (uint[])u.Data;
-					GL.Uniform1(u.Location, data.Length, data);
-				}
-				else if (u.Type == typeof(Matrix4))
-				{
-					Matrix4[] data = (Matrix4[])u.Data;
-					GL.UniformMatrix4(u.Location, false, ref data[0]);
-				}
-				else
-					throw (new NotImplementedException("type " + u.Type + " not supported"));
-			}
+			
 		}
-        public void ApplyTo(Surface surface)
+        public int GetUniformLoc(string name)
+        {
+            int loc=-1;
+            if (!uniformLocations.TryGetValue(name, out loc))
+            {
+                loc = GL.GetUniformLocation(Program, name);
+                uniformLocations.Add(name, loc);
+				Log.Write(name + " Location: " + loc);
+            }
+            return loc;
+        }
+        public void ApplyTo(Surface surface, params ShaderParamBase[] parameters)
         {
             using (Surface pong = new Surface())
             {
@@ -207,6 +219,10 @@ namespace SharpGL.Drawing
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 surface.Clear();
                 Use(); // calls GL.UseProgram()
+                foreach (var p in parameters)
+                {
+                    p.Apply(this);
+                }
                 pong.BindTexture();
                 surface.BindFramebuffer();
 
@@ -225,7 +241,7 @@ namespace SharpGL.Drawing
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             }
         }
-        public void ApplyTo(Surface source, Surface target)
+        public void ApplyTo(Surface source, Surface target, params ShaderParamBase[] parameters)
         {
             GL.Viewport(0, 0, target.Width, target.Height);
             GL.MatrixMode(MatrixMode.Projection);
@@ -234,6 +250,10 @@ namespace SharpGL.Drawing
             GL.UseProgram(0);
             target.Clear();
             Use(); // calls GL.UseProgram()
+            foreach(var p in parameters)
+            {
+                p.Apply(this);
+            }
             source.BindTexture();
             target.BindFramebuffer();
 

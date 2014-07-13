@@ -17,23 +17,18 @@ namespace SharpGL.Components
 		private float zFar;
 		private float fov;
 		protected Matrix4 projectionMatrix;
-		public Material bufferMaterial;
+		public Material CameraMaterial { get; private set; }
 		private Mesh screenMesh;
-		private Shader cameraShader;
 		public int VAO { get; private set; }
 
 		public Shader CameraShader
 		{
 			get
 			{
-				if (bufferMaterial == null)
+				if (CameraMaterial == null)
 					return null;
 				else
-					return bufferMaterial.Shader;
-			}
-			set 
-			{
-				SetupScreenShader(value);
+					return CameraMaterial.Shader;
 			}
 		}
 		public Vector3 PositionTarget { get; set; }
@@ -114,12 +109,14 @@ namespace SharpGL.Components
 				2,3,0,
 				0,1,2
 			});
-			screenMesh.SetDrawHints(new VertexObjectDrawHint("pos", 2, 2, 0));
+			screenMesh.SetDrawHints(new VertexObjectDrawHint("pos", 2, 2, 0, false));
+			screenMesh.UpdateBuffers();
 			VAO = GL.GenVertexArray();
 			SetupProjection();
 		}
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
+			Matrix4 s = Matrix4.CreateScale(model.Scale);
 			Matrix4 t = Matrix4.CreateTranslation(model.Position - Transform.Position);
 			Matrix4 r = Matrix4.CreateFromQuaternion(Transform.Rotation * model.Rotation.Inverted());
 			if (float.IsNaN(r.M11))
@@ -127,7 +124,7 @@ namespace SharpGL.Components
 			Matrix4 p = projectionMatrix;
 
 			//p.Transpose();
-			return t * r * p;
+			return s * t * r * p;
 		}
 		public void Update(float tDelta)
 		{
@@ -201,19 +198,20 @@ namespace SharpGL.Components
 					Transform.Rotate(Transform.Right, delta * sign);
 			}
 		}
-		private void SetupScreenShader(Shader shader)
+		public void SetCameraShader(Shader shader, int multisampling)
 		{
-			if (shader == null)
+			if (CameraMaterial != null)
 			{
-				bufferMaterial.Dispose();
-				bufferMaterial = null;
-
+				CameraMaterial.Dispose();
+				CameraMaterial = null;
 			}
-			else
+			if(shader != null)
 			{
+
 				Surface bufferSurface = new Surface();
-				bufferSurface.Create(GameObject.App.Window.Width, GameObject.App.Window.Height, new Surface.SurfaceFormat { DepthBuffer = true, WrapMode = TextureWrapMode.Clamp});
-				bufferMaterial = new Material(shader, new Material.Texture("tex", bufferSurface));
+				bufferSurface.Create(GameObject.App.Window.Width, GameObject.App.Window.Height, new Surface.SurfaceFormat { DepthBuffer = true, WrapMode = TextureWrapMode.Clamp, Multisample = multisampling});
+				CameraMaterial = new Material(shader, new Material.Texture("tex", bufferSurface));
+				
 			}
 		}
 		private void SetupProjection()
@@ -226,10 +224,10 @@ namespace SharpGL.Components
 		}
 		public void BeginDraw()
 		{
-			if(bufferMaterial != null)
+			if(CameraMaterial != null)
 			{
-				bufferMaterial.Textures[0].Surface.Clear();
-				bufferMaterial.Textures[0].Surface.BindFramebuffer();
+				CameraMaterial.Textures[0].Surface.Clear();
+				CameraMaterial.Textures[0].Surface.BindFramebuffer();
 				beganDraw = true;
 			}
 		}
@@ -239,13 +237,13 @@ namespace SharpGL.Components
 			{
 				beganDraw = false;
 				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-				if (bufferMaterial != null)
+				if (CameraMaterial != null)
 				{
 					GL.BindBuffer(BufferTarget.ArrayBuffer, screenMesh.VBO);
 					GL.BindVertexArray(VAO);
 					GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenMesh.VEO);
-					bufferMaterial.Use();
-					screenMesh.ApplyDrawHints(bufferMaterial.Shader);
+					CameraMaterial.Use();
+					screenMesh.ApplyDrawHints(CameraMaterial.Shader);
 					GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 					GL.BindVertexArray(0);

@@ -29,12 +29,12 @@ namespace SharpGL.Drawing
         }
         public Shader Shader {get; set;}
         public List<Texture> Textures { get; private set; }
-        private Dictionary<string, ShaderParamBase> parameters;
+		public ShaderParamCollection Parameters { get; private set; }
         public Material(Shader shader, params Texture[] textures)
         {
             Shader = shader;
             Textures = new List<Texture>(textures);
-            parameters = new Dictionary<string, ShaderParamBase>();
+			Parameters = new ShaderParamCollection();
             
         }
         public Material(Shader shader, Surface texture)
@@ -42,22 +42,27 @@ namespace SharpGL.Drawing
             Shader = shader;
             Textures = new List<Texture>();
             Textures.Add(new Texture(texture));
-            parameters = new Dictionary<string, ShaderParamBase>();
-
+			Parameters = new ShaderParamCollection();
         }
         public Material(Surface texture)
         {
             Shader = null;
             Textures = new List<Texture>();
             Textures.Add(new Texture(texture));
-            parameters = new Dictionary<string, ShaderParamBase>();
+			Parameters = new ShaderParamCollection();
         }
         public Material(params Texture[] textures)
         {
             Shader = null;
             Textures = new List<Texture>(textures);
-            parameters = new Dictionary<string, ShaderParamBase>();
+			Parameters = new ShaderParamCollection();
         }
+		public Material(Shader shader)
+		{
+			Shader = shader;
+			Textures = new List<Texture>();
+			Parameters = new ShaderParamCollection();
+		}
         public void Use()
         {
 			GL.Enable(EnableCap.Texture2D);
@@ -73,24 +78,12 @@ namespace SharpGL.Drawing
                     Shader.SetUniform<int>(t.Name, new int[] { k++ });
                 }
             }
-            foreach (var p in parameters.Values)
+            foreach (var p in Parameters.Paramters.Values)
             {
                 p.Apply(Shader);
             }
         }
-        public void SetParameter<T>(string name, params T[] values)
-        {
-            ShaderParamBase param;
-            if(!parameters.TryGetValue(name, out param))
-            {
-                parameters.Add(name, new ShaderParam<T>(name, values));
-            }
-            else
-            {
-                parameters[name].Values = values;
-            }
-
-        }
+        
         public void Dispose()
         {
             foreach (var t in Textures)

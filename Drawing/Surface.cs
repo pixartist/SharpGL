@@ -18,12 +18,14 @@ namespace SharpGL.Drawing
             public PixelType SourceType = PixelType.UnsignedByte;
             public IntPtr Pixels = IntPtr.Zero;
             public bool DepthBuffer = false;
+			public int Multisample = 1;
             public SurfaceFormat(
                 PixelInternalFormat internalFormat = PixelInternalFormat.Rgba8,
                 TextureWrapMode wrapMode = TextureWrapMode.Repeat,
                 PixelFormat pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba,
                 PixelType sourceType = PixelType.UnsignedByte,
                 bool depthBuffer = false,
+				int multisample = 1,
                 IntPtr? pixels = null
                 )
             {
@@ -34,6 +36,7 @@ namespace SharpGL.Drawing
                 if (pixels.HasValue)
                     this.Pixels = pixels.Value;
                 this.DepthBuffer = depthBuffer;
+				this.Multisample = multisample;
             }
         }
         private bool disposed = false;

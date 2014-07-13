@@ -15,7 +15,7 @@ namespace SharpGL.Components
 		
 		public PrimitiveType PrimitiveType { get; set; }
 		public int Components { get; private set; }
-		public Shader Shader { get; set; }
+		public Material Material { get; set; }
 		public int VAO { get; private set; }
 		public int Stride { get; private set; }
 		public bool CanRender
@@ -32,7 +32,7 @@ namespace SharpGL.Components
 							{
 								if (Mesh.HasDrawHints)
 								{
-									if (Mesh.VerticeComponentCount > 0)
+									if (Mesh.VertexArrayLength > 0)
 									{
 										return true;
 									}
@@ -48,13 +48,15 @@ namespace SharpGL.Components
 		internal override void Init()
 		{
 			VAO = GL.GenVertexArray();
-			Shader = GameObject.App.Shaders["default"];
+			Material = GameObject.App.Materials["unlit"];
 			PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 		}
 		internal override void Render(float time)
 		{
+			Mesh.UpdateBuffers();
 			if(CanRender)
 			{
+				
 				int elementCount = Mesh.ElementCount;
 				if (elementCount > 0)
 				{
@@ -63,15 +65,16 @@ namespace SharpGL.Components
 					if (Mesh.VEO > 0)
 						GL.BindBuffer(BufferTarget.ElementArrayBuffer, Mesh.VEO);
 
-					if (Shader != null)
+					if (Material != null)
 					{
 
-						Shader.SetUniform("_time", time);
-						Shader.SetUniform<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
-						Shader.Use();
+						Material.Parameters.SetParameter<float>("_time", time);
+						Material.Parameters.SetParameter<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
+						Material.Use();
+						Mesh.ApplyParameters(Material.Shader);
 						//default shader vars
 						
-						Mesh.ApplyDrawHints(Shader);
+						Mesh.ApplyDrawHints(Material.Shader);
 					}
 					if (Mesh.VEO > 0)
 						GL.DrawElements(PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);

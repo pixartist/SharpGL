@@ -47,7 +47,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\MeshRenderer.cs" />
-    <Compile Include="Drawing\Gui.cs" />
+    <Compile Include="Components\Gui.cs" />
     <Compile Include="Drawing\Mesh.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Components\Camera.cs" />
@@ -63,14 +63,25 @@
     <Compile Include="Input\MouseHandler.cs" />
     <Compile Include="Factories\PrimitiveFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShaderParamCollection.cs" />
     <Compile Include="ShaderParameter.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mathf.cs" />
     <Compile Include="Transform.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\default.glsl">
+    <None Include="Shaders\unlit.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\screen.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\chromaticAbberation.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

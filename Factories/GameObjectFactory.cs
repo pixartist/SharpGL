@@ -26,7 +26,8 @@ namespace SharpGL.Factories
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
 			r.Mesh = App.PrimitiveFactory.CreateCube(size);
 			r.PrimitiveType = PrimitiveType.Triangles;
-			r.Shader = App.Shaders["default"];
+			r.Material = App.Materials["unlit"];
+			r.Material.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
 		public GameObject CreateCube(Vector3 position, Vector3 scale)
@@ -37,7 +38,8 @@ namespace SharpGL.Factories
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
 			r.Mesh = App.PrimitiveFactory.CreateCube(new Vector3(1,1,1));
 			r.PrimitiveType = PrimitiveType.Triangles;
-			r.Shader = App.Shaders["default"];
+			r.Material = App.Materials["unlit"];
+			r.Material.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
 		public GameObject CreatePlane(Vector3 scale, Vector3 position)
@@ -48,7 +50,8 @@ namespace SharpGL.Factories
 			MeshRenderer r = result.AddComponent<MeshRenderer>();
 			r.Mesh = App.PrimitiveFactory.CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
 			r.PrimitiveType = PrimitiveType.Triangles;
-			r.Shader = App.Shaders["default"];
+			r.Material = App.Materials["unlit"];
+			r.Material.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
 	}

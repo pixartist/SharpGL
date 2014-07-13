@@ -25,7 +25,7 @@ namespace SharpGL.Drawing
 			{
 				Vector2 s = cam.NearplaneSize;
 				Mesh = GameObject.App.PrimitiveFactory.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
-				Shader = GameObject.App.Shaders["default"];
+				Material = GameObject.App.Materials["unlit"];
 				PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 			}
 		}

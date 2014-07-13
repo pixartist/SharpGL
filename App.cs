@@ -17,6 +17,7 @@ namespace SharpGL
 	public class App
 	{
 		public Dictionary<string, Shader> Shaders;
+		public Dictionary<string, Material> Materials;
 		public GameObjectFactory GameObjectFactory { get; protected set; }
 		public PrimitiveFactory PrimitiveFactory { get; protected set; }
 		private Dictionary<string, GameObject> GameObjects;
@@ -42,8 +43,9 @@ namespace SharpGL
         {
 			GameObjects = new Dictionary<string, GameObject>();
 			Shaders = new Dictionary<string, Shader>();
-			
-            Window = new GameWindow(width, height);
+			Materials = new Dictionary<string, Material>();
+
+            Window = new GameWindow(width, height, new GraphicsMode(32, 24,0, 4));
             Window.Load += OnLoadInternal;
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;
@@ -59,13 +61,11 @@ namespace SharpGL
 			time = new System.Diagnostics.Stopwatch();
 			time.Start();
 
-			Shaders.Add("default", new Shader("Shaders/default.glsl", "vertex", null, "fragment"));
-			Shaders.Add("screen", new Shader("Shaders/default.glsl", "vertexScreen", null, "fragmentScreen"));
-			var ca = new Shader("Shaders/default.glsl", "vertexScreen", null, "fragmentScreenCA");
-			ca.SetUniform("baseBlur", 0.5f);
-			ca.SetUniform("blur",14f);
-			ca.SetUniform("chromatic", 0.1f);
-			Shaders.Add("screenCA", ca);
+			Shaders.Add("unlit", new Shader("Shaders/unlit.glsl", "vertex", null, "fragment"));
+			Shaders.Add("screen", new Shader("Shaders/screen.glsl", "vertex", null, "fragment"));
+			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
+
+			Materials.Add("unlit", new Material(Shaders["unlit"]));
 
 			GameObjectFactory = new GameObjectFactory(this);
 			PrimitiveFactory = new PrimitiveFactory();
