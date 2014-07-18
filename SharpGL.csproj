@@ -51,13 +51,10 @@
     <Compile Include="Drawing\Mesh.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Components\Camera.cs" />
-    <Compile Include="Drawing\DrawContext.cs" />
     <Compile Include="Drawing\Material.cs" />
     <Compile Include="Drawing\Shader.cs" />
-    <Compile Include="Drawing\Sprite.cs" />
     <Compile Include="Drawing\Surface.cs" />
     <Compile Include="Drawing\VertexObject.cs" />
-    <Compile Include="Game.cs" />
     <Compile Include="Factories\GameObjectFactory.cs" />
     <Compile Include="Input\KeyboardHandler.cs" />
     <Compile Include="Input\MouseHandler.cs" />

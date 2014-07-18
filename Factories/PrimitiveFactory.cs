@@ -12,13 +12,24 @@ namespace SharpGL.Factories
 {
 	public class PrimitiveFactory
 	{
+		/// <summary>
+		/// A simple 1x1x1 cube mesh
+		/// </summary>
 		public Mesh Cube { get; private set; }
+		/// <summary>
+		/// A simple plane mesh facing UP (1x1 segments)
+		/// </summary>
 		public Mesh Plane { get; private set; }
 		public PrimitiveFactory()
 		{
 			Cube = CreateCube(Vector3.One);
 			Plane = CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
 		}
+		/// <summary>
+		/// Creates a NEW cube mesh
+		/// </summary>
+		/// <param name="size">Size in world units</param>
+		/// <returns></returns>
 		private Mesh CreateCube(Vector3 size)
 		{
 			Mesh mesh = new Mesh();
@@ -46,8 +57,19 @@ namespace SharpGL.Factories
 			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false), new VertexObjectDrawHint("normal", 3, 6, 3, true));
 			return mesh;
 		}
-		
-		private Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
+		/// <summary>
+		/// Creates a NEW plane mesh
+		/// </summary>
+		/// <param name="x">Position X</param>
+		/// <param name="y">Position Y</param>
+		/// <param name="z">Position Z</param>
+		/// <param name="width">Width in world units</param>
+		/// <param name="depth">Depth in world units</param>
+		/// <param name="segmentsX">Number of segments along the X axis</param>
+		/// <param name="segmentsZ">Number of segments along the Z axis</param>
+		/// <param name="rotation">Rotation of the vertices</param>
+		/// <returns></returns>
+		public Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
 		{
 			int verticeX = segmentsX + 1;
 			int verticeZ = segmentsZ + 1;
