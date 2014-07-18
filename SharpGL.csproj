@@ -63,6 +63,7 @@
     <Compile Include="Input\MouseHandler.cs" />
     <Compile Include="Factories\PrimitiveFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MeshRenderCore.cs" />
     <Compile Include="ShaderParamCollection.cs" />
     <Compile Include="ShaderParameter.cs" />
     <Compile Include="Log.cs" />

@@ -28,11 +28,6 @@ namespace SharpGL
 			components = new Dictionary<Type, Component>();
 			AddComponent<Transform>();
 		}
-		internal void Render(float dTime)
-		{
-			foreach (var c in components.Values)
-				c.Render(dTime);
-		}
 		public GameObject AddChild(GameObject child)
 		{
 			children.Add(child);

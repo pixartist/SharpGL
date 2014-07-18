@@ -24,14 +24,10 @@ namespace SharpGL.Drawing
 			if (TryGetActiveCamera(out cam))
 			{
 				Vector2 s = cam.NearplaneSize;
-				Mesh = GameObject.App.PrimitiveFactory.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
+				Mesh = GameObject.App.PrimitiveFactory.Plane;//.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
 				Material = GameObject.App.Materials["unlit"];
 				PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 			}
-		}
-		internal override void Render(float dT)
-		{
-			base.Render(dT);
 		}
 	}
 }

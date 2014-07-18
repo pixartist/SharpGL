@@ -227,21 +227,21 @@ namespace SharpGL
 			get
 			{
 
-				return RotateBy(Vector3.UnitX);
+				return Vector3.Transform(Vector3.UnitX, LocalRotation);
 			}
 		}
 		public virtual Vector3 Forward
 		{
 			get
 			{
-				return RotateBy(-Vector3.UnitZ);
+				return Vector3.Transform(-Vector3.UnitZ, LocalRotation);
 			}
 		}
 		public virtual Vector3 Up
 		{
 			get
 			{
-				return RotateBy(Vector3.UnitY);
+				return Vector3.Transform(Vector3.UnitY, LocalRotation);
 			}
 		}
 		public virtual Vector3 EulerAngles
@@ -257,35 +257,18 @@ namespace SharpGL
 			LocalRotation = Quaternion.Identity;
 			LocalScale = Vector3.One;
 		}
-		public Vector3 RotateBy(Vector3 inVec)
-		{
-			return Vector3.Transform(inVec, LocalRotation.Inverted());
-		}
 		public bool TryGetParent(out Transform parent)
 		{
 			parent = Parent;
 			return parent != null;
-		}
-		/*public virtual Matrix4 GetLocalMatrix()
-		{
-			Matrix4 translation = Matrix4.CreateTranslation(LocalPosition);
-			Matrix4 rotation = Matrix4.CreateFromQuaternion(LocalRotation);
-			Matrix4 scale = Matrix4.CreateScale(LocalScale);
-			return scale * translation * rotation;
 		}
 		public virtual Matrix4 GetMatrix()
 		{
 			Matrix4 translation = Matrix4.CreateTranslation(Position);
 			Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
 			Matrix4 scale = Matrix4.CreateScale(LocalScale);
-			return scale * translation * rotation;
+			return scale * rotation * translation;
 		}
-		public virtual Matrix4 GetViewMatrix()
-		{
-			Matrix4 translation = Matrix4.CreateTranslation(-Position);
-			Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
-			return translation * rotation;
-		}*/
 		public virtual void Translate(Vector3 amount)
 		{
 			LocalPosition += amount;
@@ -296,7 +279,7 @@ namespace SharpGL
 		}
 		public virtual void Rotate(Vector3 axis, float angle)
 		{
-			LocalRotation *= Quaternion.FromAxisAngle(axis, angle);
+			LocalRotation = Quaternion.FromAxisAngle(axis, angle) * LocalRotation;
 		}
 	}
 }

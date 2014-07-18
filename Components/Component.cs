@@ -18,6 +18,15 @@ namespace SharpGL.Components
 				return null;
 			}
 		}
+		public App App
+		{
+			get
+			{
+				if (GameObject != null)
+					return GameObject.App;
+				return null;
+			}
+		}
 		protected Component()
 		{
 
@@ -28,8 +37,6 @@ namespace SharpGL.Components
 				GameObject.RemoveComponent(this);
 		}
 		internal virtual void Init()
-		{ }
-		internal virtual void Render(float time)
 		{ }
 		public bool TryGetActiveCamera(out Camera camera)
 		{
@@ -44,5 +51,6 @@ namespace SharpGL.Components
 			camera = null;
 			return false;
 		}
+		
 	}
 }

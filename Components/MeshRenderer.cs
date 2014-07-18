@@ -11,34 +11,58 @@ namespace SharpGL.Components
 {
 	public class MeshRenderer : Component
 	{
-		public virtual Mesh Mesh { get; set; }
-		
+		private Mesh _mesh;
+		private Material _material;
+		public Mesh Mesh
+		{
+			get
+			{
+				return _mesh;
+			}
+			set
+			{
+				App.MeshRenderCore.RemoveRenderer(this);
+				_mesh = value;
+				App.MeshRenderCore.AddRenderer(this);
+			}
+		}
+		public Material Material
+		{
+			get
+			{
+				return _material;
+			}
+			set
+			{
+				App.MeshRenderCore.RemoveRenderer(this);
+				_material = value;
+				App.MeshRenderCore.AddRenderer(this);
+			}
+		}
 		public PrimitiveType PrimitiveType { get; set; }
 		public int Components { get; private set; }
-		public Material Material { get; set; }
-		public int VAO { get; private set; }
+		public ShaderParamCollection Parameters { get; private set; }
+		
 		public int Stride { get; private set; }
 		public bool CanRender
 		{
 			get
 			{
-				if (GameObject != null)
+				if(App != null)
 				{
-					if (GameObject.App != null)
+					if (App.ActiveCamera != null)
 					{
-						if (GameObject.App.ActiveCamera != null)
+						if (Mesh != null)
 						{
-							if (Mesh != null)
+							if (Mesh.HasDrawHints)
 							{
-								if (Mesh.HasDrawHints)
+								if (Mesh.VertexArrayLength > 0)
 								{
-									if (Mesh.VertexArrayLength > 0)
-									{
-										return true;
-									}
+									return true;
 								}
 							}
 						}
+
 					}
 				}
 				return false;
@@ -47,50 +71,32 @@ namespace SharpGL.Components
 		
 		internal override void Init()
 		{
-			VAO = GL.GenVertexArray();
-			Material = GameObject.App.Materials["unlit"];
+			Material = App.Materials["unlit"];
 			PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
+			Parameters = new ShaderParamCollection();
+			App.MeshRenderCore.AddRenderer(this);
 		}
-		internal override void Render(float time)
+		public void ApplyParameters(Shader shader)
 		{
-			Mesh.UpdateBuffers();
-			if(CanRender)
-			{
-				
-				int elementCount = Mesh.ElementCount;
-				if (elementCount > 0)
-				{
-					GL.BindBuffer(BufferTarget.ArrayBuffer, Mesh.VBO);
-					GL.BindVertexArray(VAO);
-					if (Mesh.VEO > 0)
-						GL.BindBuffer(BufferTarget.ElementArrayBuffer, Mesh.VEO);
-
-					if (Material != null)
-					{
-
-						Material.Parameters.SetParameter<float>("_time", time);
-						Material.Parameters.SetParameter<Matrix4>("_modelViewProjection", GameObject.App.ActiveCamera.GetModelViewProjectionMatrix(Transform));
-						Material.Use();
-						Mesh.ApplyParameters(Material.Shader);
-						//default shader vars
-						
-						Mesh.ApplyDrawHints(Material.Shader);
-					}
-					if (Mesh.VEO > 0)
-						GL.DrawElements(PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
-					else
-						GL.DrawArrays(PrimitiveType, 0, elementCount);
-					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-					GL.BindVertexArray(0);
-					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-					GL.UseProgram(0);
-				}
-			}
+			foreach (var p in Parameters.Paramters.Values)
+				p.Apply(shader);
+		}
+		public void SetMesh(Mesh m)
+		{
+			App.MeshRenderCore.RemoveRenderer(this);
+			Mesh = m;
+			App.MeshRenderCore.AddRenderer(this);
+		}
+		public void SetMaterial(Material m)
+		{
+			App.MeshRenderCore.RemoveRenderer(this);
+			Material = m;
+			App.MeshRenderCore.AddRenderer(this);
 		}
 		
 		public override void Destroy()
 		{
-			GL.DeleteVertexArray(VAO);
+			
 			base.Destroy();
 		}
 	}

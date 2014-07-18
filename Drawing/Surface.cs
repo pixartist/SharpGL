@@ -58,39 +58,56 @@ namespace SharpGL.Drawing
         }
         public void Create(int width, int height, SurfaceFormat format)
         {
+			bool multisample = format.Multisample > 1;
+			if (multisample)
+				GL.Enable(EnableCap.Multisample);
+			int samples = Math.Max(1, Math.Min(format.Multisample, 4));
+			TextureTarget target = multisample ? TextureTarget.Texture2DMultisample : TextureTarget.Texture2D;
             Width = width;
             Height = height;
             textureHandle = GL.GenTexture();
             //bind texture
-            GL.BindTexture(TextureTarget.Texture2D, textureHandle);
+			
+			GL.BindTexture(target, textureHandle);
             Log.Error("Bound Texture: " + GL.GetError());
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)format.WrapMode);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)format.WrapMode);
+			if (!multisample)
+			{
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)format.WrapMode);
+				GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)format.WrapMode);
+			}
             
             Log.Error("Created Texture Parameters: " + GL.GetError());
-            GL.TexImage2D(TextureTarget.Texture2D, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
+			if (format.Multisample < 2)
+				GL.TexImage2D(target, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
+			else
+				GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, samples, format.InternalFormat, Width, Height, false);
             Log.Error("Created Image: " + GL.GetError());
             //unbind texture
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+			GL.BindTexture(target, 0);
             //create depthbuffer
             if (format.DepthBuffer)
             {
                 GL.GenRenderbuffers(1, out dbHandle);
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, dbHandle);
-                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, Width, Height);
+				GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, dbHandle);
+				
+				if(multisample)
+					GL.RenderbufferStorageMultisample(RenderbufferTarget.RenderbufferExt, samples, RenderbufferStorage.Depth24Stencil8, Width, Height);
+				else
+					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24, Width, Height);
             }
 
             //create fbo
             fboHandle = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, fboHandle);
-            GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, textureHandle, 0);
+            GL.BindFramebuffer(FramebufferTarget.FramebufferExt, fboHandle);
+            GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, target, textureHandle, 0);
+			
             if(format.DepthBuffer)
-                GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, dbHandle);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            Log.Error("Created Framebuffer: " + GL.GetError());
-            
+				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt, RenderbufferTarget.RenderbufferExt, dbHandle);
+			Log.Debug("Framebuffer status: " + GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt));
+			Log.Error("Created Framebuffer: " + GL.GetError());
+            GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
         }
         public void CreateFromPNG(string filePath)
         {

@@ -20,7 +20,7 @@ namespace SharpGL.Drawing
 		public int VEO { get; private set; }
 		public int Stride { get; private set; }
 		public bool BuffersUpdated { get; private set; }
-		public ShaderParamCollection Parameters { get; private set; }
+		
 		
 		public bool HasDrawHints
 		{
@@ -50,7 +50,7 @@ namespace SharpGL.Drawing
 		{
 			VBO = -1;
 			VEO = -1;
-			Parameters = new ShaderParamCollection();
+			
 		}
 		public void SetDrawHints(params VertexObjectDrawHint[] drawHints)
 		{
@@ -116,11 +116,7 @@ namespace SharpGL.Drawing
 				BuffersUpdated = true;
 			}
 		}
-		public void ApplyParameters(Shader shader)
-		{
-			foreach (var p in Parameters.Paramters.Values)
-				p.Apply(shader);
-		}
+		
 		public void DeleteBuffers()
 		{
 			if (VBO > 0)

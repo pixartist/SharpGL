@@ -116,15 +116,10 @@ namespace SharpGL.Components
 		}
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
-			Matrix4 s = Matrix4.CreateScale(model.Scale);
-			Matrix4 t = Matrix4.CreateTranslation(model.Position - Transform.Position);
-			Matrix4 r = Matrix4.CreateFromQuaternion(Transform.Rotation * model.Rotation.Inverted());
-			if (float.IsNaN(r.M11))
-				r = Matrix4.Identity;
+			Matrix4 m = model.GetMatrix();
+			Matrix4 v = Transform.GetMatrix().Inverted() ;
 			Matrix4 p = projectionMatrix;
-
-			//p.Transpose();
-			return s * t * r * p;
+			return m * v * p;
 		}
 		public void Update(float tDelta)
 		{
@@ -192,7 +187,7 @@ namespace SharpGL.Components
 			if (PitchLock)
 			{
 				float a = Vector3.CalculateAngle(Vector3.UnitY, Transform.Up);
-				float sign =  Math.Sign(Transform.Forward.Y);
+				float sign =  -Math.Sign(Transform.Forward.Y);
 				float delta = a - (float)Math.PI / 2;
 				if (delta > 0)
 					Transform.Rotate(Transform.Right, delta * sign);
@@ -269,27 +264,7 @@ namespace SharpGL.Components
 			screen -= new Vector2(0.5f, -0.5f);
 			screen.Y /= AspectRatio;
 			screen *= NearplaneSize.X;
-			//screen.Y /= AspectRatio;
-			//screen *= Mathf.Deg2Rad(Fov);
-			//screen.Y /= AspectRatio;
-			//Quaternion fw = Transform.Rotation;
-			//fw *= Quaternion.FromAxisAngle(Transform.Right, screen.Y);
-			//fw *= Quaternion.FromAxisAngle(Transform.Up, screen.X);
-			
-			/*float x = screen.X / GameO;
-			float y = -1 * (1.0f - screen.Y / (GameObject.App.Window.Height * 0.5f));
-			float dx = Mathf.Tan(Fov * 0.5f) * x / AspectRatio;
-			float dy = Mathf.Tan(Fov * 0.5f) * y;
-			Matrix4 inv = GameObject.Transform.GetMatrix().Inverted();
-			Vector3 p1 = new Vector3(dx * ZNear, dy * ZNear, ZNear);
-			Vector3 p2 = new Vector3(dx * ZFar, dy * ZFar, ZFar);
-			p1 = Vector3.Transform(p1, inv);
-			p2 = Vector3.Transform(p2, inv);
-			return (p2 - p1).Normalized();*/
-			//Console.WriteLine(Transform.Position);
-			//Log.Write(fw.ToString());
-			//var res = Vector3.Transform(-Vector3.UnitZ, fw.Conjugated());
-			return Transform.RotateBy(new Vector3(screen.X, screen.Y, -1).Normalized());
+			return Vector3.Transform(new Vector3(screen.X, screen.Y, -1).Normalized(), Transform.Rotation);
 		}
 		public Vector3 ScreenToWorld(Vector2 screen)
 		{

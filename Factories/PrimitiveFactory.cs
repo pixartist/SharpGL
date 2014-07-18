@@ -12,7 +12,14 @@ namespace SharpGL.Factories
 {
 	public class PrimitiveFactory
 	{
-		public Mesh CreateCube(Vector3 size)
+		public Mesh Cube { get; private set; }
+		public Mesh Plane { get; private set; }
+		public PrimitiveFactory()
+		{
+			Cube = CreateCube(Vector3.One);
+			Plane = CreatePlane(0, 0, 0, 1, 1, 1, 1, Quaternion.Identity);
+		}
+		private Mesh CreateCube(Vector3 size)
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
@@ -25,16 +32,6 @@ namespace SharpGL.Factories
 				        0,  + size.Y,  + size.Z, -1,  1,  1, //6
 				 + size.X,  + size.Y,  + size.Z,  1,  1,  1 //7
 			};
-			/*float[] vertices = new float[] {
-				        0,         0,         0, //0
-				 + size.X,         0,         0, //1
-				        0,  + size.Y,         0, //2
-				 + size.X,  + size.Y,         0, //3
-				        0,         0,  + size.Z, //4
-				 + size.X,         0,  + size.Z, //5
-				        0,  + size.Y,  + size.Z, //6
-				 + size.X,  + size.Y,  + size.Z, //7
-			};*/
 			mesh.SetVertices(vertices);
 			uint[] indices = new uint[] {
 				0,2,1,1,2,3, //front
@@ -50,7 +47,7 @@ namespace SharpGL.Factories
 			return mesh;
 		}
 		
-		public Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
+		private Mesh CreatePlane(float x, float y, float z, float width, float depth, int segmentsX, int segmentsZ, Quaternion rotation)
 		{
 			int verticeX = segmentsX + 1;
 			int verticeZ = segmentsZ + 1;

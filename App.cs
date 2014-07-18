@@ -20,6 +20,7 @@ namespace SharpGL
 		public Dictionary<string, Material> Materials;
 		public GameObjectFactory GameObjectFactory { get; protected set; }
 		public PrimitiveFactory PrimitiveFactory { get; protected set; }
+		public MeshRenderCore MeshRenderCore { get; protected set; }
 		private Dictionary<string, GameObject> GameObjects;
 		
 		private System.Diagnostics.Stopwatch stopWatch;
@@ -50,7 +51,7 @@ namespace SharpGL
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;
             Window.RenderFrame += OnRenderInternal;
-
+			MeshRenderCore = new SharpGL.MeshRenderCore();
 			SetupGL();
 			
 			CameraContainer = CreateGameObject("Camera");
@@ -94,10 +95,11 @@ namespace SharpGL
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			if(ActiveCamera != null)
 				ActiveCamera.BeginDraw();
-			foreach(var go in GameObjects.Values)
+			/*foreach(var go in GameObjects.Values)
 			{
 				go.Render(Time);
-			}
+			}*/
+			MeshRenderCore.Render(ActiveCamera, Time);
 			//User drawing
             OnDraw();
 			if (ActiveCamera != null)
