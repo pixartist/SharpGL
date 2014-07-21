@@ -34,14 +34,14 @@ namespace SharpGL.Factories
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
-				        0,         0,         0, -1, -1, -1, //0
-				 + size.X,         0,         0,  1, -1, -1, //1
-				        0,  + size.Y,         0, -1,  1, -1, //2
-				 + size.X,  + size.Y,         0,  1,  1, -1, //3
-				        0,         0,  + size.Z, -1, -1,  1, //4
-				 + size.X,         0,  + size.Z,  1, -1,  1, //5
-				        0,  + size.Y,  + size.Z, -1,  1,  1, //6
-				 + size.X,  + size.Y,  + size.Z,  1,  1,  1 //7
+				        0,         0,         0, -1, -1, -1, 0, 0, //0
+				 + size.X,         0,         0,  1, -1, -1, 1, 0, //1
+				        0,  + size.Y,         0, -1,  1, -1, 0, 1, //2
+				 + size.X,  + size.Y,         0,  1,  1, -1, 1, 1, //3
+				        0,         0,  + size.Z, -1, -1,  1, 0, 1, //4
+				 + size.X,         0,  + size.Z,  1, -1,  1, 1, 1, //5
+				        0,  + size.Y,  + size.Z, -1,  1,  1, 0, 0, //6
+				 + size.X,  + size.Y,  + size.Z,  1,  1,  1, 1, 0,//7
 			};
 			mesh.SetVertices(vertices);
 			uint[] indices = new uint[] {
@@ -54,7 +54,7 @@ namespace SharpGL.Factories
 			};
 			mesh.SetIndices(indices);
 			//mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false));
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false), new VertexObjectDrawHint("normal", 3, 6, 3, true));
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 8, 0, false), new VertexObjectDrawHint("normal", 3, 8, 3, true), new VertexObjectDrawHint("texCoord", 2, 8, 6, false));
 			return mesh;
 		}
 		/// <summary>
@@ -75,7 +75,7 @@ namespace SharpGL.Factories
 			int verticeZ = segmentsZ + 1;
 			float sx = 1f/verticeX;
 			float sz = 1f/verticeZ;
-			float[] vertices = new float[verticeX * verticeZ * 6];
+			float[] vertices = new float[verticeX * verticeZ * 8];
 			uint index;
 			Vector3 tmp;
 			Mesh mesh = new Mesh();
@@ -83,7 +83,7 @@ namespace SharpGL.Factories
 			{
 				for(int iz = 0; iz < verticeZ; iz++)
 				{
-					index = (uint)(ix * verticeZ + iz) * 6;
+					index = (uint)(ix * verticeZ + iz) * 8;
 					tmp = new Vector3(x + width * sx * ix * 2, 0, y + depth * sz * iz * 2);
 					tmp = Vector3.Transform(tmp, rotation);
 					tmp += Vector3.Transform(Vector3.UnitY, rotation) * z ;
@@ -93,6 +93,8 @@ namespace SharpGL.Factories
 					vertices[index + 3] = 0;
 					vertices[index + 4] = 1;
 					vertices[index + 5] = 0;
+					vertices[index + 6] = ix / (float)(verticeX-1);
+					vertices[index + 7] = iz / (float)(verticeZ-1);
 				}
 				
 			}
@@ -102,7 +104,7 @@ namespace SharpGL.Factories
 			{
 				for (uint iz = 0; iz < segmentsZ; iz++)
 				{
-					index = (uint)(ix * segmentsZ + iz) * 6;
+					index = (uint)(ix * segmentsZ + iz) * 8;
 					vIndex = (uint)((ix * verticeZ + iz) * 3);
 					indices[index] = vIndex;
 					indices[index + 1] = vIndex + 1;
@@ -114,7 +116,7 @@ namespace SharpGL.Factories
 			}
 			mesh.SetVertices(vertices);
 			mesh.SetIndices(indices);
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false), new VertexObjectDrawHint("normal", 3, 6, 3, true));
+			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 8, 0, false), new VertexObjectDrawHint("normal", 3, 8, 3, true), new VertexObjectDrawHint("texCoord", 2, 8, 6, false));
 			return mesh;
 		}
 	}

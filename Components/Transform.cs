@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using SharpGL.Components;
-namespace SharpGL
+namespace SharpGL.Components
 {
 	
 	public static class Extensions
@@ -179,7 +179,7 @@ namespace SharpGL
 				Transform p;
 				if (TryGetParent(out p))
 				{
-					return Vector3.Add(p.Position, LocalPosition);
+					return Vector3.Add(p.Position, Vector3.Transform(LocalPosition, p.Rotation));
 				}
 				return LocalPosition;
 			}
@@ -266,7 +266,7 @@ namespace SharpGL
 		{
 			Matrix4 translation = Matrix4.CreateTranslation(Position);
 			Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
-			Matrix4 scale = Matrix4.CreateScale(LocalScale);
+			Matrix4 scale = Matrix4.CreateScale(Scale);
 			return scale * rotation * translation;
 		}
 		public virtual void Translate(Vector3 amount)

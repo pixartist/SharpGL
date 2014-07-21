@@ -191,9 +191,8 @@ namespace SharpGL.Drawing
         }
         public void ApplyTo(Surface surface, params ShaderParamBase[] parameters)
         {
-            using (Surface pong = new Surface())
+			using (Surface pong = new Surface(surface.Width, surface.Height))
             {
-                pong.Create(surface.Width, surface.Height);
                 pong.Clear();
 
                 GL.Viewport(0, 0, surface.Width, surface.Height);

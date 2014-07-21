@@ -28,40 +28,20 @@ namespace SharpGL.Drawing
             }
         }
         public Shader Shader {get; set;}
-        public List<Texture> Textures { get; private set; }
+		public bool Transparency { get; set; }
+        public Dictionary<string, Surface> Textures { get; private set; }
 		public ShaderParamCollection Parameters { get; private set; }
-        public Material(Shader shader, params Texture[] textures)
-        {
-            Shader = shader;
-            Textures = new List<Texture>(textures);
-			Parameters = new ShaderParamCollection();
-            
-        }
-        public Material(Shader shader, Surface texture)
-        {
-            Shader = shader;
-            Textures = new List<Texture>();
-            Textures.Add(new Texture(texture));
-			Parameters = new ShaderParamCollection();
-        }
-        public Material(Surface texture)
-        {
-            Shader = null;
-            Textures = new List<Texture>();
-            Textures.Add(new Texture(texture));
-			Parameters = new ShaderParamCollection();
-        }
-        public Material(params Texture[] textures)
-        {
-            Shader = null;
-            Textures = new List<Texture>(textures);
-			Parameters = new ShaderParamCollection();
-        }
-		public Material(Shader shader)
+        
+		public Material(Shader shader, bool transparency = false)
 		{
+			this.Transparency = transparency;
 			Shader = shader;
-			Textures = new List<Texture>();
+			Textures = new Dictionary<string, Surface>();
 			Parameters = new ShaderParamCollection();
+		}
+		public void AddTexture(string name, Surface texture)
+		{
+			Textures.Add(name, texture);
 		}
         public void Use()
         {
@@ -69,15 +49,15 @@ namespace SharpGL.Drawing
             if(Shader != null)
                 Shader.Use();
             int k = 0;
-            foreach (var t in Textures)
-            {
+			foreach (var t in Textures)
+			{
 				GL.ActiveTexture(TextureUnit.Texture0 + k);
-                t.Surface.BindTexture(OpenTK.Graphics.OpenGL.TextureUnit.Texture0 + k);
-                if(t.Name != null)
-                {
-                    Shader.SetUniform<int>(t.Name, new int[] { k++ });
-                }
-            }
+				t.Value.BindTexture(OpenTK.Graphics.OpenGL.TextureUnit.Texture0 + k);
+				if (t.Key != null)
+				{
+					Shader.SetUniform<int>(t.Key, new int[] { k++ });
+				}
+			}
             foreach (var p in Parameters.Paramters.Values)
             {
                 p.Apply(Shader);
@@ -88,7 +68,7 @@ namespace SharpGL.Drawing
         {
             foreach (var t in Textures)
             {
-                t.Surface.Dispose();
+                t.Value.Dispose();
             }
             Shader.Dispose();
         }

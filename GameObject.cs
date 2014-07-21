@@ -58,6 +58,10 @@ namespace SharpGL
 			{
 				c.Destroy();
 			}
+			foreach(var c in children)
+			{
+				c.Destroy();
+			}
 		}
 		public T Component<T>() where T : Component
 		{

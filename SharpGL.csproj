@@ -65,9 +65,13 @@
     <Compile Include="ShaderParameter.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mathf.cs" />
-    <Compile Include="Transform.cs" />
+    <Compile Include="Components\Transform.cs" />
+    <Compile Include="Drawing\Texture2D.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\gui.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\unlit.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

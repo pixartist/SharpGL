@@ -75,6 +75,7 @@ namespace SharpGL.Drawing
 		{
 			if(!BuffersUpdated)
 			{
+				BuffersUpdated = true;
 				Stride = -1;
 				VertexArrayLength = -1;
 				IndexArrayLength = -1;
@@ -113,7 +114,7 @@ namespace SharpGL.Drawing
 				{
 					GL.DeleteBuffer(VBO);
 				}
-				BuffersUpdated = true;
+				
 			}
 		}
 		

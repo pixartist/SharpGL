@@ -14,11 +14,12 @@ namespace SharpGL
 	{
 		private Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>> renderCalls;
 		private int VAO;
+		public bool UseAlphaToCoverage { get; set; }
 		public MeshRenderCore()
 		{
 			renderCalls = new Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>>();
 			VAO = GL.GenVertexArray();
-			
+			UseAlphaToCoverage = true;
 		}
 		public void AddRenderer(MeshRenderer renderer)
 		{
@@ -34,11 +35,9 @@ namespace SharpGL
 				if (!dict.TryGetValue(renderer.Material, out renderers))
 				{
 					renderers = new List<MeshRenderer>();
-					renderers.Add(renderer);
 					dict.Add(renderer.Material, renderers);
 				}
-				if (!renderers.Contains(renderer))
-					renderers.Add(renderer);
+				renderers.Add(renderer);
 			}
 		}
 		public void RemoveRenderer(MeshRenderer renderer)
@@ -58,6 +57,10 @@ namespace SharpGL
 		}
 		public void Render(Camera camera, float time)
 		{
+			GL.DepthFunc(DepthFunction.Less);
+			GL.DepthMask(true);
+			bool doRender;
+			Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>> transpCalls = null;
 			foreach (var mesh in renderCalls)
 			{
 				mesh.Key.UpdateBuffers();
@@ -71,27 +74,137 @@ namespace SharpGL
 
 					foreach (var mat in mesh.Value)
 					{
-						mat.Key.Use();
-						mat.Key.Shader.SetUniform<float>("_time", time);
-						
-						mesh.Key.ApplyDrawHints(mat.Key.Shader);
-						foreach (var c in mat.Value)
+						doRender = true;
+						if (!camera.Multisampling || !UseAlphaToCoverage)
 						{
-							mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
-							c.ApplyParameters(mat.Key.Shader);
-							if (mesh.Key.VEO > 0)
-								GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
-							else
-								GL.DrawArrays(c.PrimitiveType, 0, elementCount);
-
-							
+							//No multisampling -> Depth Peeling
+							if (mat.Key.Transparency)
+							{
+								doRender = false;
+								if (transpCalls == null)
+									transpCalls = new Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>>();
+								Dictionary<Material, List<MeshRenderer>> dict;
+								if (!transpCalls.TryGetValue(mesh.Key, out dict))
+								{
+									dict = new Dictionary<Material, List<MeshRenderer>>();
+									transpCalls.Add(mesh.Key, dict);
+								}
+								List<MeshRenderer> renderers;
+								if (!dict.TryGetValue(mat.Key, out renderers))
+								{
+									renderers = new List<MeshRenderer>();
+									dict.Add(mat.Key, renderers);
+								}
+								foreach (var c in mat.Value)
+								{
+									renderers.Add(c);
+								}
+							}
 						}
-						GL.UseProgram(0);
+						//Multisampling -> Alpha to Coverage
+						if (doRender)
+						{
+							mat.Key.Use();
+							mat.Key.Shader.SetUniform<float>("_time", time);
+							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							foreach (var c in mat.Value)
+							{
+								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
+								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+								c.ApplyParameters(mat.Key.Shader);
+								if (mesh.Key.VEO > 0)
+									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
+								else
+									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+
+
+							}
+							GL.UseProgram(0);
+						}
 					}
 				}
+
 				GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 				GL.BindVertexArray(0);
 				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+			}
+			//Draw transparent meshes without color (if multisampling disabled)
+			if (transpCalls != null)
+			{
+				GL.ColorMask(false, false, false, false);
+				foreach (var mesh in transpCalls)
+				{
+					mesh.Key.UpdateBuffers();
+					int elementCount = mesh.Key.ElementCount;
+					if (elementCount > 0)
+					{
+						GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
+						GL.BindVertexArray(VAO);
+						if (mesh.Key.VEO > 0)
+							GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+						foreach (var mat in mesh.Value)
+						{
+							mat.Key.Use();
+							mat.Key.Shader.SetUniform<float>("_time", time);
+							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							foreach (var c in mat.Value)
+							{
+								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
+								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+								c.ApplyParameters(mat.Key.Shader);
+								if (mesh.Key.VEO > 0)
+									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
+								else
+									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+							}
+							GL.UseProgram(0);
+						}
+					}
+					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+					GL.BindVertexArray(0);
+					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+				}
+				GL.ColorMask(true, true, true, true);
+				//Draw again but with color
+				GL.DepthFunc(DepthFunction.Equal);
+				GL.DepthMask(false);
+				foreach (var mesh in transpCalls)
+				{
+					mesh.Key.UpdateBuffers();
+					int elementCount = mesh.Key.ElementCount;
+					if (elementCount > 0)
+					{
+						GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
+						GL.BindVertexArray(VAO);
+						if (mesh.Key.VEO > 0)
+							GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+						foreach (var mat in mesh.Value)
+						{
+							mat.Key.Use();
+							mat.Key.Shader.SetUniform<float>("_time", time);
+							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							foreach (var c in mat.Value)
+							{
+								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
+								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+								c.ApplyParameters(mat.Key.Shader);
+								if (mesh.Key.VEO > 0)
+									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
+								else
+									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+							}
+							GL.UseProgram(0);
+						}
+					}
+					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+					GL.BindVertexArray(0);
+					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+				}
+				GL.DepthFunc(DepthFunction.Less);
+				GL.DepthMask(true);
 			}
 		}
 	}

@@ -104,6 +104,7 @@ namespace SharpGL
 			Shaders.Add("unlit", new Shader("Shaders/unlit.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screen", new Shader("Shaders/screen.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
+			Shaders.Add("gui", new Shader("Shaders/gui.glsl", "vertexRect", null, "fragmentRect"));
 
 			Materials.Add("unlit", new Material(Shaders["unlit"]));
 
@@ -134,7 +135,7 @@ namespace SharpGL
         private void OnRenderInternal(object sender, FrameEventArgs e)
         {
             var window = (GameWindow)sender;
-			
+			GL.Viewport(0, 0, window.Width, window.Height);
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			if(ActiveCamera != null)
@@ -177,6 +178,7 @@ namespace SharpGL
         }
 		private void SetupGL()
 		{
+			
 			GL.Enable(EnableCap.CullFace);
 			EnabledTextureBlending();
 			GL.Enable(EnableCap.DepthTest);
