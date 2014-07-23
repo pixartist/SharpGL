@@ -8,7 +8,7 @@ using SharpGL.Components;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-namespace SharpGL
+namespace SharpGL.Drawing
 {
 	public class MeshRenderCore
 	{
@@ -151,6 +151,7 @@ namespace SharpGL
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
+								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
 								c.ApplyParameters(mat.Key.Shader);
@@ -158,6 +159,7 @@ namespace SharpGL
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
 								else
 									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+								c.OnPostDraw();
 							}
 							GL.UseProgram(0);
 						}
@@ -188,6 +190,7 @@ namespace SharpGL
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
+								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
 								c.ApplyParameters(mat.Key.Shader);
@@ -195,6 +198,7 @@ namespace SharpGL
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
 								else
 									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+								c.OnPostDraw();
 							}
 							GL.UseProgram(0);
 						}

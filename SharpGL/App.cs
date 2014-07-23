@@ -36,10 +36,14 @@ namespace SharpGL
 		/// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
 		/// </summary>
 		public MeshRenderCore MeshRenderCore { get; protected set; }
-		private Dictionary<string, GameObject> GameObjects;
-		
+
+		public BlendingFactorSrc DefaultBlendFactorSrc { get; set; }
+		public BlendingFactorDest DefaultBlendFactorDest { get; set; }
+		public float Fps { get; private set; }
+		private Dictionary<string, GameObject> GameObjects;	
 		private System.Diagnostics.Stopwatch stopWatch;
 		private System.Diagnostics.Stopwatch time;
+		private long lastTime;
 		/// <summary>
 		/// Gets the current game time in seconds
 		/// </summary>
@@ -81,16 +85,19 @@ namespace SharpGL
 		public float DT { get; private set; }
         public App(int width, int height)
         {
+			lastTime = 0;
 			GameObjects = new Dictionary<string, GameObject>();
 			Shaders = new Dictionary<string, Shader>();
 			Materials = new Dictionary<string, Material>();
-
+			DefaultBlendFactorSrc = BlendingFactorSrc.SrcAlpha;
+			DefaultBlendFactorDest = BlendingFactorDest.OneMinusSrcAlpha;
+			
             Window = new GameWindow(width, height, new GraphicsMode(32, 24,0, 4));
             Window.Load += OnLoadInternal;
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;
             Window.RenderFrame += OnRenderInternal;
-			MeshRenderCore = new SharpGL.MeshRenderCore();
+			MeshRenderCore = new MeshRenderCore();
 			SetupGL();
 			
 			var cameraContainer = CreateGameObject("Camera");
@@ -105,7 +112,7 @@ namespace SharpGL
 			Shaders.Add("screen", new Shader("Shaders/screen.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
 			Shaders.Add("gui", new Shader("Shaders/gui.glsl", "vertexRect", null, "fragmentRect"));
-
+			Shaders.Add("text", new Shader("Shaders/text.glsl", "vertex", null, "fragment"));
 			Materials.Add("unlit", new Material(Shaders["unlit"]));
 
 			GameObjectFactory = new GameObjectFactory(this);
@@ -134,6 +141,11 @@ namespace SharpGL
 		
         private void OnRenderInternal(object sender, FrameEventArgs e)
         {
+			long newTime = time.ElapsedMilliseconds;
+			long delta = (newTime - lastTime);
+			if(delta > 0)
+				Fps = Fps * 0.9f + (1000f / delta)*0.1f;
+			lastTime = newTime;
             var window = (GameWindow)sender;
 			GL.Viewport(0, 0, window.Width, window.Height);
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -180,16 +192,16 @@ namespace SharpGL
 		{
 			
 			GL.Enable(EnableCap.CullFace);
-			EnabledTextureBlending();
+			ResetBlendFunc();
 			GL.Enable(EnableCap.DepthTest);
 			GL.DepthMask(true);
 			GL.DepthFunc(DepthFunction.Less);
 			GL.DepthRange(0.0f, 1.0f);
-		}
-		private void EnabledTextureBlending()
-		{
 			GL.Enable(EnableCap.Texture2D);
-			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+		}
+		public void ResetBlendFunc()
+		{
+			GL.BlendFunc(DefaultBlendFactorSrc, DefaultBlendFactorDest);
 			GL.Enable(EnableCap.Blend);
 		}
         /// <summary>

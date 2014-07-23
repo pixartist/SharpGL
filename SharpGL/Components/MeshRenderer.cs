@@ -93,7 +93,14 @@ namespace SharpGL.Components
 			Material = m;
 			App.MeshRenderCore.AddRenderer(this);
 		}
-		
+		public virtual void OnPreDraw()
+		{
+		}
+
+		public virtual void OnPostDraw()
+		{ 
+		}
+
 		public override void Destroy()
 		{
 			

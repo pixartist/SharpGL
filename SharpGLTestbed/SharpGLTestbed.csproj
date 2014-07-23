@@ -51,10 +51,24 @@
     <Compile Include="ShaderGame.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\SharpGL\Shaders\chromaticAbberation.glsl">
+      <Link>Shaders\chromaticAbberation.glsl</Link>
+    </None>
+    <None Include="..\SharpGL\Shaders\gui.glsl">
+      <Link>Shaders\gui.glsl</Link>
+    </None>
+    <None Include="..\SharpGL\Shaders\screen.glsl">
+      <Link>Shaders\screen.glsl</Link>
+    </None>
+    <None Include="..\SharpGL\Shaders\text.glsl">
+      <Link>Shaders\text.glsl</Link>
+    </None>
+    <None Include="..\SharpGL\Shaders\unlit.glsl">
+      <Link>Shaders\unlit.glsl</Link>
+    </None>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="myShaders.txt" />
     <Content Include="sun.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -69,6 +83,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

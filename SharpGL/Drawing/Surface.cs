@@ -35,30 +35,34 @@ namespace SharpGL.Drawing
 			bool multisample = format.Multisampling > 1;
 			
 			int samples = Math.Max(1, Math.Min(format.Multisampling, 4));
-			TextureTarget target = multisample ? TextureTarget.Texture2DMultisample : TextureTarget.Texture2D;
+			format.TextureTarget = multisample ? TextureTarget.Texture2DMultisample : format.TextureTarget;
+			format.MipMapping = format.MipMapping && format.TextureTarget == TextureTarget.Texture2D;
 			Width = width;
 			Height = height;
 			textureHandle = GL.GenTexture();
 			//bind texture
-			
-			GL.BindTexture(target, textureHandle);
+
+			GL.BindTexture(format.TextureTarget, textureHandle);
 			Log.Error("Bound Texture: " + GL.GetError());
-			if (!multisample)
+			if (format.TextureTarget == TextureTarget.Texture2D)
 			{
-				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-				GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)format.WrapMode);
-				GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)format.WrapMode);
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureMinFilter, (int)(format.MipMapping ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureWrapS, (int)format.WrapMode);
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureWrapT, (int)format.WrapMode);
 			}
             
 			Log.Debug("Created Texture Parameters: " + GL.GetError());
 			if (samples < 2)
-				GL.TexImage2D(target, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
+				GL.TexImage2D(format.TextureTarget, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
 			else
 				GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, samples, format.InternalFormat, Width, Height, true);
+			if (format.MipMapping)
+				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+			
 			Log.Debug("Created Image: " + GL.GetError());
 			//unbind texture
-			GL.BindTexture(target, 0);
+			GL.BindTexture(format.TextureTarget, 0);
 			//create depthbuffer
 			if (format.DepthBuffer)
 			{
@@ -74,7 +78,7 @@ namespace SharpGL.Drawing
 			//create fbo
 			fboHandle = GL.GenFramebuffer();
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, fboHandle);
-			GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, target, textureHandle, 0);
+			GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, format.TextureTarget, textureHandle, 0);
 
 			if (format.DepthBuffer)
 				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt, RenderbufferTarget.RenderbufferExt, dbHandle);

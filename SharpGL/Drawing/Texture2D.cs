@@ -14,17 +14,21 @@ namespace SharpGL.Drawing
 		public TextureWrapMode WrapMode = TextureWrapMode.Repeat;
 		public PixelFormat PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
 		public PixelType SourceType = PixelType.UnsignedByte;
+		public TextureTarget TextureTarget = TextureTarget.Texture2D;
 		public IntPtr Pixels = IntPtr.Zero;
 		public bool DepthBuffer = true;
+		public bool MipMapping = false;
 		public int Multisampling = 0;
 		public SurfaceFormat(
 			PixelInternalFormat internalFormat = PixelInternalFormat.Rgba8,
 			TextureWrapMode wrapMode = TextureWrapMode.Repeat,
 			PixelFormat pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba,
 			PixelType sourceType = PixelType.UnsignedByte,
+			TextureTarget TextureTarget = TextureTarget.Texture2D,
 			IntPtr? pixels = null,
 			int multisampling = 0,
-			bool depthBuffer = true
+			bool depthBuffer = true,
+			bool Mimapping = false
 		)
 		{
 			this.InternalFormat = internalFormat;
@@ -33,6 +37,8 @@ namespace SharpGL.Drawing
 			this.SourceType = sourceType;
 			this.Multisampling = multisampling;
 			this.DepthBuffer = depthBuffer;
+			this.TextureTarget = TextureTarget;
+			this.MipMapping = Mimapping;
 			if (pixels.HasValue)
 				this.Pixels = pixels.Value;
 		}
@@ -75,21 +81,25 @@ namespace SharpGL.Drawing
 			textureHandle = GL.GenTexture();
 			//bind texture
 			
-			GL.BindTexture(TextureTarget.Texture2D, textureHandle);
+			GL.BindTexture(format.TextureTarget, textureHandle);
 			Log.Error("Bound Texture: " + GL.GetError());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)format.WrapMode);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)format.WrapMode);
-			
+			if (format.TextureTarget == TextureTarget.Texture2D)
+			{
+
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureMinFilter, (int)(format.MipMapping ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureWrapS, (int)format.WrapMode);
+				GL.TexParameter(format.TextureTarget, TextureParameterName.TextureWrapT, (int)format.WrapMode);
+			}
             
 			Log.Debug("Created Texture Parameters: " + GL.GetError());
 
-			GL.TexImage2D(TextureTarget.Texture2D, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
-			
+			GL.TexImage2D(format.TextureTarget, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
+			if (format.MipMapping)
+				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 			Log.Debug("Created Image: " + GL.GetError());
 			//unbind texture
-			GL.BindTexture(TextureTarget.Texture2D, 0);
+			GL.BindTexture(format.TextureTarget, 0);
 		}
         protected virtual void CreateFromPNG(string filePath)
         {
@@ -135,7 +145,7 @@ namespace SharpGL.Drawing
         public void BindTexture(TextureUnit slot = TextureUnit.Texture0)
         {
             GL.ActiveTexture(slot);
-            GL.BindTexture(TextureTarget.Texture2D, textureHandle);
+            GL.BindTexture(format.TextureTarget, textureHandle);
             
         }
         public void Dispose()

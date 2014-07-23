@@ -289,11 +289,13 @@ namespace SharpGL.Components
 		}
 		public Vector2 WorldToScreen(Vector3 world)
 		{
-			/*Vector3 tmp = Vector3.Transform(world, (GameObject.Transform.GetMatrix() * projectionMatrix));
-			tmp.X = (tmp.X + 1) * 0.5f * GameObject.App.Window.Width;
-			tmp.Y = (1 - tmp.Y) * 0.5f * GameObject.App.Window.Height;
-			return new Vector2(tmp.X, tmp.Y);*/
-			throw (new NotImplementedException());
+			Matrix4 v = Transform.GetMatrix().Inverted();
+			Matrix4 p = projectionMatrix;
+			Vector4 wsv = Vector4.Transform(new Vector4(world, 1), v * p);
+			wsv /= wsv.W;
+			wsv.X = (wsv.X + 1) ;
+			wsv.Y = (1- wsv.Y) ;
+			return new Vector2(wsv.X * GameObject.App.Window.Width, wsv.Y * GameObject.App.Window.Height);
 		}
 		
 		public Vector3 ScreenToDirection(Vector2 screen)
