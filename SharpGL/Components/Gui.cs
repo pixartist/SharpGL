@@ -52,7 +52,7 @@ namespace SharpGL.Drawing
 				Modified = false;
 			}
 			if(BlendAdditive)
-				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One); 
 		}
 		public override void OnPostDraw()
 		{
