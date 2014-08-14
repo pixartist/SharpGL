@@ -87,11 +87,12 @@ namespace SharpGL.Components
 			Mesh = m;
 			App.MeshRenderCore.AddRenderer(this);
 		}
-		public void SetMaterial(Material m)
+		public Material SetMaterial(Material m)
 		{
 			App.MeshRenderCore.RemoveRenderer(this);
 			Material = m;
 			App.MeshRenderCore.AddRenderer(this);
+			return Material;
 		}
 		public virtual void OnPreDraw()
 		{

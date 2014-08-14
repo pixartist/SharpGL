@@ -103,7 +103,7 @@ namespace SharpGL.Components
 			RotAccel = 1;
 			PitchLock = true;
 			fov = 90;
-			zNear = 0.2f;
+			zNear = 0.1f;
 			zFar = 120f;
 			screenMesh = new Mesh();
 			screenMesh.SetVertices(new float[] {
@@ -120,6 +120,7 @@ namespace SharpGL.Components
 			screenMesh.UpdateBuffers();
 			VAO = GL.GenVertexArray();
 			SetupProjection();
+			
 		}
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
@@ -210,7 +211,7 @@ namespace SharpGL.Components
 			if(shader != null)
 			{
 				Surface bufferSurface;
-				if (multisampling > 1)
+				if (multisampling > 0)
 				{
 					if (multisampler != null)
 						multisampler.Dispose();
@@ -224,7 +225,7 @@ namespace SharpGL.Components
 					multisampler = null;
 					bufferSurface = new Surface(GameObject.App.Window.Width, GameObject.App.Window.Height, new SurfaceFormat { WrapMode = TextureWrapMode.Clamp, DepthBuffer = true });
 				}
-				CameraMaterial = new Material(shader);
+				CameraMaterial = new Material(shader, RenderMode.Opaque);
 				CameraMaterial.AddTexture("_tex", bufferSurface);
 			}
 		}
@@ -264,6 +265,7 @@ namespace SharpGL.Components
 				
 				if (CameraMaterial != null)
 				{
+					
 					if (multisampler != null)
 					{
 						GL.Disable(EnableCap.SampleAlphaToCoverage);

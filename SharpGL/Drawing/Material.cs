@@ -7,34 +7,40 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
+	public enum RenderMode
+	{
+		Opaque,
+		Translucent
+	}
     public class Material : IDisposable
     {
+		
         public struct Texture
         {
             /// <summary>
             /// Name of the sampler in the shader
             /// </summary>
             public string Name;
-            public Surface Surface;
-            public Texture(string name, Surface surface)
+			public Texture2D Surface;
+            public Texture(string name, Texture2D surface)
             {
                 Name = name;
                 Surface = surface;
             }
-            public Texture(Surface surface)
+			public Texture(Texture2D surface)
             {
                 Name = null;
                 Surface = surface;
             }
         }
         public Shader Shader {get; set;}
-		public bool Transparency { get; set; }
+		public RenderMode RenderMode { get; set; }
         public Dictionary<string, Surface> Textures { get; private set; }
 		public ShaderParamCollection Parameters { get; private set; }
         
-		public Material(Shader shader, bool transparency = false)
+		public Material(Shader shader, RenderMode renderMode)
 		{
-			this.Transparency = transparency;
+			RenderMode = renderMode;
 			Shader = shader;
 			Textures = new Dictionary<string, Surface>();
 			Parameters = new ShaderParamCollection();

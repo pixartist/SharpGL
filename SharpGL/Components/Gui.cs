@@ -34,7 +34,7 @@ namespace SharpGL.Drawing
 				Vector2 s = cam.NearplaneSize;
 				Mesh = GameObject.App.PrimitiveFactory.Plane;//.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
 				drawBuffer = new Surface(width, height, new SurfaceFormat { DepthBuffer = false, MipMapping = true });
-				Material = new Drawing.Material(App.Shaders["unlit"], true);
+				Material = new Drawing.Material(App.Shaders["unlit"], RenderMode.Translucent);
 				
 				Material.AddTexture("_tex", drawBuffer);
 				PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
@@ -46,9 +46,9 @@ namespace SharpGL.Drawing
 		{
 			if(Modified)
 			{
-				drawBuffer.BindTexture();
+				//drawBuffer.BindTexture();
 				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-				GL.BindTexture(TextureTarget.Texture2D, 0);
+				//GL.BindTexture(TextureTarget.Texture2D, 0);
 				Modified = false;
 			}
 			if(BlendAdditive)
@@ -66,12 +66,12 @@ namespace SharpGL.Drawing
 		}
 		public void DrawText(string text, Font font, float charDistance, Vector2 position, Vector4 color)
 		{
-			font.DrawString(ref drawBuffer, App.Shaders["text"], text, charDistance, position, color);
+			font.DrawString(drawBuffer, App.Shaders["text"], text, charDistance, position, color);
 			Modified = true;
 		}
 		public void DrawText(string text, Font font, float charDistance, Vector2 position)
 		{
-			font.DrawString(ref drawBuffer, App.Shaders["text"], text, charDistance, position, Vector4.One);
+			font.DrawString(drawBuffer, App.Shaders["text"], text, charDistance, position, Vector4.One);
 			Modified = true;
 		}
 	}

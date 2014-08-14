@@ -97,7 +97,7 @@ namespace SharpGL
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;
             Window.RenderFrame += OnRenderInternal;
-			MeshRenderCore = new MeshRenderCore();
+			MeshRenderCore = new MeshRenderCore(this);
 			SetupGL();
 			
 			var cameraContainer = CreateGameObject("Camera");
@@ -113,7 +113,7 @@ namespace SharpGL
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
 			Shaders.Add("gui", new Shader("Shaders/gui.glsl", "vertexRect", null, "fragmentRect"));
 			Shaders.Add("text", new Shader("Shaders/text.glsl", "vertex", null, "fragment"));
-			Materials.Add("unlit", new Material(Shaders["unlit"]));
+			Materials.Add("unlit", new Material(Shaders["unlit"], RenderMode.Opaque));
 
 			GameObjectFactory = new GameObjectFactory(this);
 			PrimitiveFactory = new PrimitiveFactory();

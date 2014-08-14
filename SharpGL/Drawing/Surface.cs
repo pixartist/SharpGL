@@ -32,9 +32,9 @@ namespace SharpGL.Drawing
 		protected override void Create(int width, int height, SurfaceFormat format)
 		{
 			this.format = format;
-			bool multisample = format.Multisampling > 1;
+			bool multisample = format.Multisampling > 0;
 			
-			int samples = Math.Max(1, Math.Min(format.Multisampling, 4));
+			int samples = Math.Max(0, Math.Min(format.Multisampling, 4));
 			format.TextureTarget = multisample ? TextureTarget.Texture2DMultisample : format.TextureTarget;
 			format.MipMapping = format.MipMapping && format.TextureTarget == TextureTarget.Texture2D;
 			Width = width;
@@ -53,7 +53,7 @@ namespace SharpGL.Drawing
 			}
             
 			Log.Debug("Created Texture Parameters: " + GL.GetError());
-			if (samples < 2)
+			if (samples < 1)
 				GL.TexImage2D(format.TextureTarget, 0, format.InternalFormat, Width, Height, 0, format.PixelFormat, format.SourceType, format.Pixels);
 			else
 				GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, samples, format.InternalFormat, Width, Height, true);

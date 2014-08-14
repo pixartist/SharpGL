@@ -50,8 +50,8 @@ namespace ModernShaders
 			GameObjectFactory.CreateCube(Vector3.Zero, Vector3.One).Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
 			Log.ShowDebug = true;
 			Log.Debug("Creating screen buffer");
-			ActiveCamera.SetCameraShader(Shaders["screenCA"],2);
-			MeshRenderCore.UseAlphaToCoverage = false;
+			ActiveCamera.SetCameraShader(Shaders["screenCA"],4);
+			MeshRenderCore.UseAlphaToCoverage = true;
 			ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("baseBlur", 0.1f);
 			ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("blur", 8f);
 			ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("chromatic", 0.03f);
@@ -70,6 +70,11 @@ namespace ModernShaders
 			rotator = GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One);
 			rotator.AddChild(GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One));
 			ActiveCamera.TransAccel *= 0.7f;
+			GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(1, 1, 1)).Component<MeshRenderer>().SetMaterial(new Material(Shaders["unlit"], RenderMode.Translucent)).AddTexture("_tex", sun);
+			Canvas canvas = new Canvas(1024,1024, true);
+			canvas.Clear(0, 0, 0, 0.5f);
+			canvas.DrawText(",.-+ A B C ABC def 123" , Shaders["text"], defaultFont, 0.5f, new Vector2(300, 300),new Vector4(1,0,0,1));
+			GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 2, 3)).Component<MeshRenderer>().SetMaterial(new Material(Shaders["unlit"], RenderMode.Opaque)).AddTexture("_tex", canvas.Surface);
 		}
 		public override void OnUpdate()
 		{

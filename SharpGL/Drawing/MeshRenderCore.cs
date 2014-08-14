@@ -14,9 +14,11 @@ namespace SharpGL.Drawing
 	{
 		private Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>> renderCalls;
 		private int VAO;
+		private App App;
 		public bool UseAlphaToCoverage { get; set; }
-		public MeshRenderCore()
+		public MeshRenderCore(App app)
 		{
+			this.App = app;
 			renderCalls = new Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>>();
 			VAO = GL.GenVertexArray();
 			UseAlphaToCoverage = true;
@@ -57,6 +59,9 @@ namespace SharpGL.Drawing
 		}
 		public void Render(Camera camera, float time)
 		{
+			camera.App.ResetBlendFunc();
+			GL.Enable(EnableCap.DepthTest);
+			GL.BlendEquation(BlendEquationMode.FuncAdd);
 			GL.DepthFunc(DepthFunction.Less);
 			GL.DepthMask(true);
 			bool doRender;
@@ -78,7 +83,7 @@ namespace SharpGL.Drawing
 						if (!camera.Multisampling || !UseAlphaToCoverage)
 						{
 							//No multisampling -> Depth Peeling
-							if (mat.Key.Transparency)
+							if (mat.Key.RenderMode == RenderMode.Translucent)
 							{
 								doRender = false;
 								if (transpCalls == null)
@@ -170,8 +175,9 @@ namespace SharpGL.Drawing
 				}
 				GL.ColorMask(true, true, true, true);
 				//Draw again but with color
-				GL.DepthFunc(DepthFunction.Equal);
+				GL.DepthFunc(DepthFunction.Lequal);
 				GL.DepthMask(false);
+				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha); 
 				foreach (var mesh in transpCalls)
 				{
 					mesh.Key.UpdateBuffers();
@@ -207,6 +213,7 @@ namespace SharpGL.Drawing
 					GL.BindVertexArray(0);
 					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 				}
+				App.ResetBlendFunc();
 				GL.DepthFunc(DepthFunction.Less);
 				GL.DepthMask(true);
 			}

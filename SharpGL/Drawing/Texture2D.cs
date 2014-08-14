@@ -8,6 +8,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
+	
 	public class SurfaceFormat
 	{
 		public PixelInternalFormat InternalFormat = PixelInternalFormat.Rgba8;
@@ -42,6 +43,35 @@ namespace SharpGL.Drawing
 			if (pixels.HasValue)
 				this.Pixels = pixels.Value;
 		}
+		public static SurfaceFormat Texture2D
+		{
+			get
+			{
+			return new SurfaceFormat( PixelInternalFormat.Rgb16, TextureWrapMode.Repeat, PixelFormat.Rgb, PixelType.Float, TextureTarget.Texture2D, null, 0, false, true);
+			}
+		}
+		public static SurfaceFormat Texture2DAlpha
+		{
+			get
+			{
+				return new SurfaceFormat(PixelInternalFormat.Rgba16, TextureWrapMode.Repeat, PixelFormat.Rgba, PixelType.Float, TextureTarget.Texture2D, null, 0, false, true);
+			}
+		}
+		public static SurfaceFormat Surface2D
+		{
+			get
+			{
+				return new SurfaceFormat(PixelInternalFormat.Rgb16, TextureWrapMode.Repeat, PixelFormat.Rgb, PixelType.Float, TextureTarget.Texture2D, null, 0, true, false);
+			}
+		}
+		public static SurfaceFormat Surface2DAlpha
+		{
+			get
+			{
+				return new SurfaceFormat(PixelInternalFormat.Rgba16, TextureWrapMode.Repeat, PixelFormat.Rgba, PixelType.Float, TextureTarget.Texture2D, null, 0, true, false);
+			}
+		}
+
 	}
 	public class Texture2D : IDisposable
 	{
@@ -63,7 +93,7 @@ namespace SharpGL.Drawing
 		}
 		public Texture2D(int width, int height)
 		{
-			Create(width, height, new SurfaceFormat());
+			Create(width, height, SurfaceFormat.Texture2D);
 		}
 		public Texture2D(int width, int height, SurfaceFormat format)
 		{

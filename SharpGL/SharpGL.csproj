@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Drawing\Canvas.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\MeshRenderer.cs" />
     <Compile Include="Components\Gui.cs" />
