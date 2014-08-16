@@ -7,16 +7,16 @@ Camera
 [Shader vertex]
 #version 150 core
 
-in vec3 pos;
-in vec3 normal;
-in vec2 texCoord;
+in vec3 _pos;
+in vec3 _normal;
+in vec2 _texCoord;
 out vec2 vTexCoord;
 
 uniform mat4 _modelViewProjection;
 
 void main() {
-    gl_Position = _modelViewProjection * vec4(pos, 1);
-	vTexCoord = texCoord;
+    gl_Position = _modelViewProjection * vec4(_pos, 1);
+	vTexCoord = _texCoord;
 }
 
 

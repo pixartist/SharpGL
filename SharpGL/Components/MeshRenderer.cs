@@ -21,9 +21,9 @@ namespace SharpGL.Components
 			}
 			set
 			{
-				App.MeshRenderCore.RemoveRenderer(this);
+				App.SceneRenderer.RemoveRenderer(this);
 				_mesh = value;
-				App.MeshRenderCore.AddRenderer(this);
+				App.SceneRenderer.AddRenderer(this);
 			}
 		}
 		public Material Material
@@ -34,9 +34,9 @@ namespace SharpGL.Components
 			}
 			set
 			{
-				App.MeshRenderCore.RemoveRenderer(this);
+				App.SceneRenderer.RemoveRenderer(this);
 				_material = value;
-				App.MeshRenderCore.AddRenderer(this);
+				App.SceneRenderer.AddRenderer(this);
 			}
 		}
 		public PrimitiveType PrimitiveType { get; set; }
@@ -74,7 +74,7 @@ namespace SharpGL.Components
 			Material = App.Materials["unlit"];
 			PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
 			Parameters = new ShaderParamCollection();
-			App.MeshRenderCore.AddRenderer(this);
+			App.SceneRenderer.AddRenderer(this);
 		}
 		public void ApplyParameters(Shader shader)
 		{
@@ -83,15 +83,15 @@ namespace SharpGL.Components
 		}
 		public void SetMesh(Mesh m)
 		{
-			App.MeshRenderCore.RemoveRenderer(this);
+			App.SceneRenderer.RemoveRenderer(this);
 			Mesh = m;
-			App.MeshRenderCore.AddRenderer(this);
+			App.SceneRenderer.AddRenderer(this);
 		}
 		public Material SetMaterial(Material m)
 		{
-			App.MeshRenderCore.RemoveRenderer(this);
+			App.SceneRenderer.RemoveRenderer(this);
 			Material = m;
-			App.MeshRenderCore.AddRenderer(this);
+			App.SceneRenderer.AddRenderer(this);
 			return Material;
 		}
 		public virtual void OnPreDraw()

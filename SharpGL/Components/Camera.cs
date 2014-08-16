@@ -12,32 +12,13 @@ namespace SharpGL.Components
 {
 	public class Camera : Component
 	{
-		private bool beganDraw;
+		
+		
 		private float zNear;
 		private float zFar;
 		private float fov;
-		private Surface multisampler;
+		
 		protected Matrix4 projectionMatrix;
-		public Material CameraMaterial { get; private set; }
-		private Mesh screenMesh;
-		public int VAO { get; private set; }
-		public bool Multisampling
-		{
-			get
-			{
-				return multisampler != null;
-			}
-		}
-		public Shader CameraShader
-		{
-			get
-			{
-				if (CameraMaterial == null)
-					return null;
-				else
-					return CameraMaterial.Shader;
-			}
-		}
 		public Vector3 PositionTarget { get; set; }
 		public Quaternion RotationTarget { get; set; }
 		public float TransAccel { get; set; }
@@ -105,20 +86,6 @@ namespace SharpGL.Components
 			fov = 90;
 			zNear = 0.1f;
 			zFar = 120f;
-			screenMesh = new Mesh();
-			screenMesh.SetVertices(new float[] {
-				-1,-1,
-				1,-1,
-				1,1,
-				-1,1
-			});
-			screenMesh.SetIndices(new uint[] {
-				2,3,0,
-				0,1,2
-			});
-			screenMesh.SetDrawHints(new VertexObjectDrawHint("pos", 2, 2, 0, false));
-			screenMesh.UpdateBuffers();
-			VAO = GL.GenVertexArray();
 			SetupProjection();
 			
 		}
@@ -132,10 +99,10 @@ namespace SharpGL.Components
 		public void Update(float tDelta)
 		{
 			if(LerpTranslation)
-				Transform.LocalPosition += (PositionTarget - Transform.LocalPosition) * TransAccel * tDelta;
+				Transform.LocalPosition += (PositionTarget - Transform.LocalPosition) * Math.Min(1, tDelta * TransAccel);
 			if (LerpRotation)
 			{
-				Transform.LocalRotation = Quaternion.Slerp(Transform.LocalRotation, RotationTarget, RotAccel * tDelta);
+				Transform.LocalRotation = Quaternion.Slerp(Transform.LocalRotation, RotationTarget, Math.Min(1, RotAccel * tDelta));
 				
 			}
 		}
@@ -197,38 +164,11 @@ namespace SharpGL.Components
 				float a = Vector3.CalculateAngle(Vector3.UnitY, Transform.Up);
 				float sign =  -Math.Sign(Transform.Forward.Y);
 				float delta = a - (float)Math.PI / 2;
-				if (delta > 0)
+				if (delta < 0)
 					Transform.Rotate(Transform.Right, delta * sign);
 			}
 		}
-		public void SetCameraShader(Shader shader, int multisampling)
-		{
-			if (CameraMaterial != null)
-			{
-				CameraMaterial.Dispose();
-				CameraMaterial = null;
-			}
-			if(shader != null)
-			{
-				Surface bufferSurface;
-				if (multisampling > 0)
-				{
-					if (multisampler != null)
-						multisampler.Dispose();
-					multisampler = new Surface(GameObject.App.Window.Width, GameObject.App.Window.Height, new SurfaceFormat { WrapMode = TextureWrapMode.Clamp, Multisampling = multisampling, DepthBuffer = true });
-					bufferSurface = new Surface(GameObject.App.Window.Width, GameObject.App.Window.Height, new SurfaceFormat { WrapMode = TextureWrapMode.Clamp, DepthBuffer = false });
-				}
-				else
-				{
-					if (multisampler != null)
-						multisampler.Dispose();
-					multisampler = null;
-					bufferSurface = new Surface(GameObject.App.Window.Width, GameObject.App.Window.Height, new SurfaceFormat { WrapMode = TextureWrapMode.Clamp, DepthBuffer = true });
-				}
-				CameraMaterial = new Material(shader, RenderMode.Opaque);
-				CameraMaterial.AddTexture("_tex", bufferSurface);
-			}
-		}
+		
 		private void SetupProjection()
 		{
 			if(GameObject != null)
@@ -237,66 +177,20 @@ namespace SharpGL.Components
 				projectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)((Math.PI * Fov) / 180), AspectRatio, ZNear, ZFar);
 			}
 		}
-		public void BeginDraw()
-		{
-			if(CameraMaterial != null)
-			{
-				if (multisampler != null)
-				{
-					multisampler.Clear();
-					if(App.MeshRenderCore.UseAlphaToCoverage)
-						GL.Enable(EnableCap.SampleAlphaToCoverage);
-					multisampler.BindFramebuffer();
-				}
-				else
-				{
-					CameraMaterial.Textures["_tex"].Clear();
-					CameraMaterial.Textures["_tex"].BindFramebuffer();
-				}
-				beganDraw = true;
-			}
-		}
-		public void EndDraw()
-		{
-			if (beganDraw)
-			{
-				beganDraw = false;
-				GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-				
-				if (CameraMaterial != null)
-				{
-					
-					if (multisampler != null)
-					{
-						GL.Disable(EnableCap.SampleAlphaToCoverage);
-						var camMat = CameraMaterial.Textures["_tex"];
-						multisampler.BindFramebuffer(FramebufferTarget.ReadFramebuffer);
-						camMat.BindFramebuffer(FramebufferTarget.DrawFramebuffer);
-						GL.BlitFramebuffer(0,0,multisampler.Width, multisampler.Height, 0,0,camMat.Width, camMat.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
-						GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-						GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
-					}
-					GL.BindBuffer(BufferTarget.ArrayBuffer, screenMesh.VBO);
-					GL.BindVertexArray(VAO);
-					GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenMesh.VEO);
-					CameraMaterial.Use();
-					screenMesh.ApplyDrawHints(CameraMaterial.Shader);
-					GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-					GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-					GL.BindVertexArray(0);
-					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-					GL.UseProgram(0);
-				}
-			}
-		}
 		public Vector2 WorldToScreen(Vector3 world)
 		{
 			Matrix4 v = Transform.GetMatrix().Inverted();
 			Matrix4 p = projectionMatrix;
 			Vector4 wsv = Vector4.Transform(new Vector4(world, 1), v * p);
 			wsv /= wsv.W;
-			wsv.X = (wsv.X + 1) ;
-			wsv.Y = (1- wsv.Y) ;
+			wsv.X = wsv.X + 1;
+			wsv.Y = wsv.Y + 1;
+			//Console.WriteLine(wsv);
+			if(wsv.Z >= 1)
+			{
+				wsv.X -= GameObject.App.Window.Width;
+				wsv.Y -= GameObject.App.Window.Height;
+			}
 			return new Vector2(wsv.X * GameObject.App.Window.Width, wsv.Y * GameObject.App.Window.Height);
 		}
 		
@@ -305,7 +199,9 @@ namespace SharpGL.Components
 			Vector2 ss = new Vector2(GameObject.App.Window.Width, -GameObject.App.Window.Height);
 			screen.X /= ss.X;
 			screen.Y /= ss.Y;
+			
 			screen -= new Vector2(0.5f, -0.5f);
+			screen.Y *= -1;
 			screen.Y /= AspectRatio;
 			screen *= NearplaneSize.X;
 			return Vector3.Transform(new Vector3(screen.X, screen.Y, -ZNear).Normalized(), Transform.Rotation);

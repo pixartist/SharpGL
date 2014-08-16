@@ -35,7 +35,7 @@ namespace SharpGL
 		/// <summary>
 		/// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
 		/// </summary>
-		public MeshRenderCore MeshRenderCore { get; protected set; }
+		public SceneRenderer SceneRenderer { get; protected set; }
 
 		public BlendingFactorSrc DefaultBlendFactorSrc { get; set; }
 		public BlendingFactorDest DefaultBlendFactorDest { get; set; }
@@ -97,7 +97,7 @@ namespace SharpGL
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;
             Window.RenderFrame += OnRenderInternal;
-			MeshRenderCore = new MeshRenderCore(this);
+			SceneRenderer = new SceneRenderer(this);
 			SetupGL();
 			
 			var cameraContainer = CreateGameObject("Camera");
@@ -111,7 +111,6 @@ namespace SharpGL
 			Shaders.Add("unlit", new Shader("Shaders/unlit.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screen", new Shader("Shaders/screen.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
-			Shaders.Add("gui", new Shader("Shaders/gui.glsl", "vertexRect", null, "fragmentRect"));
 			Shaders.Add("text", new Shader("Shaders/text.glsl", "vertex", null, "fragment"));
 			Materials.Add("unlit", new Material(Shaders["unlit"], RenderMode.Opaque));
 
@@ -150,17 +149,7 @@ namespace SharpGL
 			GL.Viewport(0, 0, window.Width, window.Height);
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-			if(ActiveCamera != null)
-				ActiveCamera.BeginDraw();
-			/*foreach(var go in GameObjects.Values)
-			{
-				go.Render(Time);
-			}*/
-			MeshRenderCore.Render(ActiveCamera, Time);
-			//User drawing
-           // OnDraw();
-			if (ActiveCamera != null)
-				ActiveCamera.EndDraw();
+			OnDraw(Time);
             window.SwapBuffers();
 			
         }
@@ -212,6 +201,10 @@ namespace SharpGL
 		/// Called every update
 		/// </summary>
         public virtual void OnUpdate() { }
+		public virtual void OnDraw(float time) 
+		{
 
+			SceneRenderer.Render(ActiveCamera, Time);
+		}
     }
 }

@@ -54,7 +54,7 @@ namespace SharpGL.Factories
 			};
 			mesh.SetIndices(indices);
 			//mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false));
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 8, 0, false), new VertexObjectDrawHint("normal", 3, 8, 3, true), new VertexObjectDrawHint("texCoord", 2, 8, 6, false));
+			mesh.SetDrawHints(new VertexObjectDrawHint("_pos", 3, 8, 0, false), new VertexObjectDrawHint("_normal", 3, 8, 3, true), new VertexObjectDrawHint("_texCoord", 2, 8, 6, false));
 			return mesh;
 		}
 		/// <summary>
@@ -94,7 +94,7 @@ namespace SharpGL.Factories
 					vertices[index + 4] = 1;
 					vertices[index + 5] = 0;
 					vertices[index + 6] = ix / (float)(verticeX-1);
-					vertices[index + 7] = iz / (float)(verticeZ-1);
+					vertices[index + 7] = 1-(iz / (float)(verticeZ-1));
 				}
 				
 			}
@@ -116,7 +116,7 @@ namespace SharpGL.Factories
 			}
 			mesh.SetVertices(vertices);
 			mesh.SetIndices(indices);
-			mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 8, 0, false), new VertexObjectDrawHint("normal", 3, 8, 3, true), new VertexObjectDrawHint("texCoord", 2, 8, 6, false));
+			mesh.SetDrawHints(new VertexObjectDrawHint("_pos", 3, 8, 0, false), new VertexObjectDrawHint("_normal", 3, 8, 3, true), new VertexObjectDrawHint("_texCoord", 2, 8, 6, false));
 			return mesh;
 		}
 	}

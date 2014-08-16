@@ -48,6 +48,7 @@
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\MeshRenderer.cs" />
     <Compile Include="Components\Gui.cs" />
+    <Compile Include="Drawing\Helper.cs" />
     <Compile Include="Drawing\Mesh.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="GameObject.cs" />
@@ -61,7 +62,7 @@
     <Compile Include="Input\MouseHandler.cs" />
     <Compile Include="Factories\PrimitiveFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Drawing\MeshRenderCore.cs" />
+    <Compile Include="Drawing\SceneRenderer.cs" />
     <Compile Include="ShaderParamCollection.cs" />
     <Compile Include="ShaderParameter.cs" />
     <Compile Include="Log.cs" />
@@ -71,9 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shaders\gui.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Shaders\unlit.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
