@@ -103,16 +103,16 @@ namespace ModernShaders
 			float hRot = (delta.X / Window.Width) * 18f;
 			float vRot = (delta.Y / Window.Width) * 18f;
 
-			ActiveCamera.Rotate(Vector3.UnitY, hRot*-1);
-			ActiveCamera.Rotate(ActiveCamera.Transform.Right, vRot*-1);
+			ActiveCamera.Rotate(Vector3.UnitY, hRot*1);
+			ActiveCamera.Rotate(ActiveCamera.Transform.Right, vRot*1);
 		}
 		public override void OnDraw(float time)
 		{
 			SceneRenderer.RenderMultisampled(ActiveCamera, multisampler, time);
 			multisampler.CloneTo(postEffect.Textures["_tex"]);
-			postEffect.Textures["_tex"].CloneTo(canvas.Surface);
-			//canvas.Clear();
-			//canvas.DrawMaterial(postEffect);
+			//postEffect.Textures["_tex"].CloneTo(canvas.Surface);
+			canvas.Clear();
+			canvas.DrawMaterial(postEffect);
 			
 			
 			//postEffect.Textures["_tex"].CloneTo(canvas.Surface);

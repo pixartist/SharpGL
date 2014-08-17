@@ -164,7 +164,7 @@ namespace SharpGL.Components
 				float a = Vector3.CalculateAngle(Vector3.UnitY, Transform.Up);
 				float sign =  -Math.Sign(Transform.Forward.Y);
 				float delta = a - (float)Math.PI / 2;
-				if (delta < 0)
+				if (delta > 0)
 					Transform.Rotate(Transform.Right, delta * sign);
 			}
 		}
@@ -201,7 +201,6 @@ namespace SharpGL.Components
 			screen.Y /= ss.Y;
 			
 			screen -= new Vector2(0.5f, -0.5f);
-			screen.Y *= -1;
 			screen.Y /= AspectRatio;
 			screen *= NearplaneSize.X;
 			return Vector3.Transform(new Vector3(screen.X, screen.Y, -ZNear).Normalized(), Transform.Rotation);

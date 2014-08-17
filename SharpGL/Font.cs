@@ -115,16 +115,16 @@ namespace SharpGL
 					texCoord = new Vector2(charLocations[c].X / texture.Width, charLocations[c].Y / texture.Height);
 					size = new Vector2(charSizes[c].X / texture.Width, charSizes[c].Y / texture.Height);
 					sizeQ = new Vector2(size.X / scale.X, size.Y / scale.Y) ;
-					GL.TexCoord2(texCoord.X, texCoord.Y);
+					GL.TexCoord2(texCoord.X, texCoord.Y + size.Y);
 					GL.Vertex2(basePos.X + xAt, basePos.Y + yAt);
-					
-					GL.TexCoord2(texCoord.X + size.X, texCoord.Y);
-					GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt);
 
 					GL.TexCoord2(texCoord.X + size.X, texCoord.Y + size.Y);
+					GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt);
+
+					GL.TexCoord2(texCoord.X + size.X, texCoord.Y);
 					GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt + sizeQ.Y);
 
-					GL.TexCoord2(texCoord.X, texCoord.Y + size.Y);
+					GL.TexCoord2(texCoord.X, texCoord.Y);
 					GL.Vertex2(basePos.X + xAt, basePos.Y + yAt + sizeQ.Y);
 
 
