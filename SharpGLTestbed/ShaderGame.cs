@@ -30,6 +30,7 @@ namespace ModernShaders
 		}
 		public override void OnLoad()
 		{
+			//handle movement
 			float camSpeed = 0.05f;
 			KeyboardHandler.RegisterKeyDown(Key.W, () => { ActiveCamera.MoveForward(camSpeed); });
 			KeyboardHandler.RegisterKeyDown(Key.S, () => { ActiveCamera.MoveForward(-camSpeed); });
@@ -50,24 +51,27 @@ namespace ModernShaders
 				Vector2 sp = new Vector2(MouseHandler.X, MouseHandler.Y);
 				GameObjectFactory.CreateCube(ActiveCamera.Transform.LocalPosition + ActiveCamera.ScreenToDirection(sp) * 2f, new Vector3(0.3f, 0.3f, 0.3f)).Component<MeshRenderer>().Parameters.SetParameter<float>("_color", Mathf.Rnd, Mathf.Rnd, Mathf.Rnd, 1); //
 			});
-			//.Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
-			GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero);
-			GameObjectFactory.CreateCube(Vector3.Zero, Vector3.One).Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
+
+			Log.ShowDebug = true;
+			Log.Debug("Creating gui");
+
+			//Setup font
+			defaultFont = new Font("arial", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ß!\"§$%&/()=?`+#*'äüö-.,:; ", 68);
+			//Setup Camera
 			ActiveCamera.TransAccel = 10f;
-			postEffect = new Material(Shaders["screen"], RenderMode.Opaque);
-			postEffect.AddTexture("_tex", new Surface(Window.Width, Window.Height, SurfaceFormat.Surface2D));
+			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
 			sf.Multisampling = 4;
 			multisampler = new Surface(Window.Width, Window.Height, sf);
-			Log.ShowDebug = true;
-			Log.Debug("Creating screen buffer");
-			//ActiveCamera.SetMultisampling(2);
-			//ActiveCamera.SetCameraShader(Shaders["screenCA"],4);
-			SceneRenderer.UseAlphaToCoverage = true;
-			//ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("baseBlur", 0.1f);
-			//ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("blur", 8f);
-			//ActiveCamera.CameraMaterial.Parameters.SetParameter<float>("chromatic", 0.03f);
-			Log.Debug("Createing gui");
+
+			postEffect = new Material(Shaders["screen"], RenderMode.Opaque);
+			postEffect.AddTexture("_tex", new Surface(Window.Width, Window.Height, SurfaceFormat.Surface2D));
+
+			//Create base plate
+			GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero);
+			GameObjectFactory.CreateCube(Vector3.Zero, Vector3.One).Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
+			
+			//Create gui
 			var guiObj = CreateGameObject("GUI");
 			gui = guiObj.AddComponent<Gui>();
 			gui.Setup(Window.Width, Window.Height);
@@ -75,28 +79,38 @@ namespace ModernShaders
 			guiObj.Transform.LocalPosition = new Vector3(ss.X/-2,ss.Y/2,-(ActiveCamera.ZNear + 0.001f));
 			gui.Transform.LocalScale = new Vector3(ss.X, 1, ss.Y);
 			guiObj.Transform.Rotate(guiObj.Transform.Right, Mathf.Deg2Rad(90));
-			Surface sun = new Surface("sun.png");
-			gui.DrawSurface(sun, 0, 0, 1024, 1024);
-			defaultFont = new Font("arial", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ß!\"§$%&/()=?`+#*'äüö-.,:; ", 68);
 			CameraContainer.AddChild(guiObj);
+
+			//Create sun image plane
+			Surface sun = new Surface("sun.png");
+			GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 1, 0)).Component<MeshRenderer>().SetMaterial(new Material(Shaders["unlit"], RenderMode.Translucent)).AddTexture("_tex", sun);
+			
+			//setup rotating cubes
 			rotator = GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One);
 			rotator.AddChild(GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One));
-			ActiveCamera.TransAccel *= 0.7f;
-			GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 1, 0)).Component<MeshRenderer>().SetMaterial(new Material(Shaders["unlit"], RenderMode.Translucent)).AddTexture("_tex", sun);
+			
+			//Create plane for camera image displaying
 			canvas = new Canvas(1024,1024, false);
 			canvas.Clear(0, 0, 0, 0.5f);
 			canvas.DrawText(",.-+ A B C ABC def 123" , Shaders["text"], defaultFont, 0.5f, new Vector2(300, 300),new Vector4(1,0,0,1));
 			planeRenderer = GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 2, 3)).Component<MeshRenderer>();
 			planeRenderer.SetMaterial(new Material(Shaders["unlit"], RenderMode.Opaque)).AddTexture("_tex", canvas.Surface);
+
+			//Gol shader
+			var golObject = GameObjectFactory.CreatePlane(Vector3.One * 5, new Vector3(8, 3, 8));
+			var goldR = golObject.Component<MeshRenderer>().SetMaterial(new Material(Shaders["gol"], RenderMode.Opaque));
+			var surf = SurfaceFormat.Surface2D;
+			surf.DepthBuffer = false;
+			surf.MipMapping = true;
+			golObject.Component<MeshRenderer>().Material.AddTexture("_tex", new Surface(1024, 1024, surf));
+			Log.Write(GL.GetError().ToString());
 			
 		}
 		public override void OnUpdate()
 		{
+			//rotate my cubes
 			rotator.Transform.Rotate(Vector3.UnitX, 0.1f);
-			gui.Material.Textures["_tex"].Clear();
-			Vector2 p = ActiveCamera.WorldToScreen(new Vector3(0,0,0));
-			gui.DrawText("Time: " + Time, defaultFont, 0.6f, p, new Vector4(1,0.5f,0.5f,1));
-			gui.DrawText("FPS:  " + Fps, defaultFont, 0.6f, new Vector2(p.X, p.Y + 100), new Vector4(1, 0.5f, 0.5f, 1));
+			
 			
 		}
 		void MouseHandler_OnMouseMove(Vector2 position, Vector2 delta)
@@ -109,6 +123,13 @@ namespace ModernShaders
 		}
 		public override void OnDraw(float time)
 		{
+			//Render gui text
+			gui.Material.Textures["_tex"].Clear();
+			Vector2 p = ActiveCamera.WorldToScreen(new Vector3(0, 0, 0));
+			gui.DrawText("Time: " + time, defaultFont, 0.6f, p, new Vector4(1, 0.5f, 0.5f, 1));
+			gui.DrawText("FPS:  " + Fps, defaultFont, 0.6f, new Vector2(p.X, p.Y + 100), new Vector4(1, 0.5f, 0.5f, 1));
+			
+			//Render multisampler
 			SceneRenderer.RenderMultisampled(ActiveCamera, multisampler, time);
 			multisampler.CloneTo(postEffect.Textures["_tex"]);
 			canvas.Clear();

@@ -112,6 +112,7 @@ namespace SharpGL
 			Shaders.Add("screen", new Shader("Shaders/screen.glsl", "vertex", null, "fragment"));
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
 			Shaders.Add("text", new Shader("Shaders/text.glsl", "vertex", null, "fragment"));
+			Shaders.Add("gol", new Shader("Shaders/gol.glsl", "vertex", null, "fragment"));
 			Materials.Add("unlit", new Material(Shaders["unlit"], RenderMode.Opaque));
 
 			GameObjectFactory = new GameObjectFactory(this);

@@ -54,8 +54,8 @@
     <None Include="..\SharpGL\Shaders\chromaticAbberation.glsl">
       <Link>Shaders\chromaticAbberation.glsl</Link>
     </None>
-    <None Include="..\SharpGL\Shaders\gui.glsl">
-      <Link>Shaders\gui.glsl</Link>
+    <None Include="..\SharpGL\Shaders\gol.glsl">
+      <Link>Shaders\gol.glsl</Link>
     </None>
     <None Include="..\SharpGL\Shaders\screen.glsl">
       <Link>Shaders\screen.glsl</Link>

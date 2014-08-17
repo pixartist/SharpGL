@@ -72,6 +72,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\gol.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\unlit.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
