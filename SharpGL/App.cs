@@ -92,7 +92,7 @@ namespace SharpGL
 			DefaultBlendFactorSrc = BlendingFactorSrc.SrcAlpha;
 			DefaultBlendFactorDest = BlendingFactorDest.OneMinusSrcAlpha;
 			
-            Window = new GameWindow(width, height, new GraphicsMode(32, 24,0, 4));
+            Window = new GameWindow(width, height, new GraphicsMode(32, 24,0, 0));
             Window.Load += OnLoadInternal;
             Window.Resize += OnResizeInternal;
             Window.UpdateFrame += OnUpdateInternal;

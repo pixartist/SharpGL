@@ -12,6 +12,7 @@ using SharpGL.Drawing;
 using SharpGL.Input;
 using SharpGL.Components;
 using SharpGL.Factories;
+using System.Threading;
 namespace ModernShaders
 {
 	class ShaderGame : App
@@ -110,12 +111,8 @@ namespace ModernShaders
 		{
 			SceneRenderer.RenderMultisampled(ActiveCamera, multisampler, time);
 			multisampler.CloneTo(postEffect.Textures["_tex"]);
-			//postEffect.Textures["_tex"].CloneTo(canvas.Surface);
 			canvas.Clear();
 			canvas.DrawMaterial(postEffect);
-			
-			
-			//postEffect.Textures["_tex"].CloneTo(canvas.Surface);
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			GL.Viewport(0, 0, Window.Width, Window.Height);
 			postEffect.Use();
