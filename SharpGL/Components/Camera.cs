@@ -75,7 +75,7 @@ namespace SharpGL.Components
 			}
 		}
 		public float AspectRatio { get; private set; }
-		internal override void Init()
+		protected override void OnInit()
 		{
 			RotationTarget = Quaternion.Identity;
 			LerpRotation = false;

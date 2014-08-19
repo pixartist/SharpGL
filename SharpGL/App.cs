@@ -35,12 +35,15 @@ namespace SharpGL
 		/// <summary>
 		/// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
 		/// </summary>
+		public Jitter.World PhysicsWorld { get; protected set; }
+		public Vector3 WorldSize { get; set; }
 		public SceneRenderer SceneRenderer { get; protected set; }
 
 		public BlendingFactorSrc DefaultBlendFactorSrc { get; set; }
 		public BlendingFactorDest DefaultBlendFactorDest { get; set; }
 		public float Fps { get; private set; }
-		private Dictionary<string, GameObject> GameObjects;	
+		public GameObject SceneRoot { get; private set; }
+		private List<DestructableObject> destroyed;
 		private System.Diagnostics.Stopwatch stopWatch;
 		private System.Diagnostics.Stopwatch time;
 		private long lastTime;
@@ -85,10 +88,12 @@ namespace SharpGL
 		public float DT { get; private set; }
         public App(int width, int height)
         {
+			WorldSize = new Vector3(20, 20, 20);
 			lastTime = 0;
-			GameObjects = new Dictionary<string, GameObject>();
+			SceneRoot = new GameObject("SceneRoot", this);
 			Shaders = new Dictionary<string, Shader>();
 			Materials = new Dictionary<string, Material>();
+			destroyed = new List<DestructableObject>();
 			DefaultBlendFactorSrc = BlendingFactorSrc.SrcAlpha;
 			DefaultBlendFactorDest = BlendingFactorDest.OneMinusSrcAlpha;
 			
@@ -117,6 +122,11 @@ namespace SharpGL
 
 			GameObjectFactory = new GameObjectFactory(this);
 			PrimitiveFactory = new PrimitiveFactory();
+
+			PhysicsWorld = new Jitter.World(new Jitter.Collision.CollisionSystemSAP());
+			PhysicsWorld.Gravity = new Jitter.LinearMath.JVector(0, -9.81f, 0);
+
+
 			Window.Run(60.0);
 			
         }
@@ -127,18 +137,12 @@ namespace SharpGL
 		/// <returns></returns>
         public GameObject CreateGameObject(string name)
 		{
-			int  i = 2;
-			string newName = name;
-			while(GameObjects.ContainsKey(newName))
-			{
-				newName = name + i;
-				i++;
-			}
-			var go = new GameObject(newName, this);
-			GameObjects.Add(newName, go);
-			return go;
+			return SceneRoot.AddChild(new GameObject(name, this));
 		}
-		
+		public void DestroyGameObject(GameObject gameObject)
+		{
+			destroyed.Add(gameObject);
+		}
         private void OnRenderInternal(object sender, FrameEventArgs e)
         {
 			long newTime = time.ElapsedMilliseconds;
@@ -163,9 +167,22 @@ namespace SharpGL
 			ActiveCamera.Update(DT);
 			MouseHandler.Update();
             KeyboardHandler.Update();
-            OnUpdate();
+			OnUpdate();
+			if (PhysicsWorld != null)
+				PhysicsWorld.Step(DT, true);
+			SceneRoot.Update(DT);
+            
+			foreach(var c in destroyed)
+			{
+				if(c != SceneRoot)
+					c.DestroyInternal();
+			}
+			destroyed.Clear();
         }
-
+		internal void ScheduleDestruction(DestructableObject obj)
+		{
+			destroyed.Add(obj);
+		}
         private void OnResizeInternal(object sender, EventArgs e)
         {
             var window = (GameWindow)sender;

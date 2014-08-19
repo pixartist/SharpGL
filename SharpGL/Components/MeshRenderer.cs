@@ -69,7 +69,7 @@ namespace SharpGL.Components
 			}
 		}
 		
-		internal override void Init()
+		protected override void OnInit()
 		{
 			Material = App.Materials["unlit"];
 			PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
@@ -87,13 +87,6 @@ namespace SharpGL.Components
 			Mesh = m;
 			App.SceneRenderer.AddRenderer(this);
 		}
-		public Material SetMaterial(Material m)
-		{
-			App.SceneRenderer.RemoveRenderer(this);
-			Material = m;
-			App.SceneRenderer.AddRenderer(this);
-			return Material;
-		}
 		public virtual void OnPreDraw()
 		{
 		}
@@ -101,11 +94,9 @@ namespace SharpGL.Components
 		public virtual void OnPostDraw()
 		{ 
 		}
-
-		public override void Destroy()
+		public override void OnDestroy()
 		{
-			
-			base.Destroy();
+			App.SceneRenderer.RemoveRenderer(this);
 		}
 	}
 }

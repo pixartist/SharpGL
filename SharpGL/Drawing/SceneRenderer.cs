@@ -40,6 +40,7 @@ namespace SharpGL.Drawing
 					dict.Add(renderer.Material, renderers);
 				}
 				renderers.Add(renderer);
+				Console.WriteLine("Added  Renderer " + renderer.GameObject.Name);
 			}
 		}
 		public void RemoveRenderer(MeshRenderer renderer)
@@ -53,6 +54,7 @@ namespace SharpGL.Drawing
 					if (dict.TryGetValue(renderer.Material, out renderers))
 					{
 						renderers.Remove(renderer);
+						Console.WriteLine("Removed Renderer " + renderer.GameObject.Name);
 					}
 				}
 			}

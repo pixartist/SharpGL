@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SharpGL.Components
 {
-	public abstract class Component
+	public abstract class Component : DestructableObject
 	{
-		public GameObject GameObject { get; internal set; }
+		public GameObject GameObject { get; private set; }
 		public Transform Transform
 		{
 			get
@@ -18,26 +18,28 @@ namespace SharpGL.Components
 				return null;
 			}
 		}
-		public App App
-		{
-			get
-			{
-				if (GameObject != null)
-					return GameObject.App;
-				return null;
-			}
-		}
 		protected Component()
+		{
+			
+		}
+		internal void Update()
+		{
+			OnUpdate();
+		}
+		internal void Init(GameObject parent)
+		{
+			GameObject = parent;
+			App = parent.App;
+			OnInit();
+		}
+		protected virtual void OnInit()
 		{
 
 		}
-		public virtual void Destroy()
+		protected virtual void OnUpdate()
 		{
-			if (GameObject != null)
-				GameObject.RemoveComponent(this);
+
 		}
-		internal virtual void Init()
-		{ }
 		public bool TryGetActiveCamera(out Camera camera)
 		{
 			if (GameObject != null)
@@ -51,6 +53,9 @@ namespace SharpGL.Components
 			camera = null;
 			return false;
 		}
-		
+		protected override void PreDestruction()
+		{
+			
+		}
 	}
 }

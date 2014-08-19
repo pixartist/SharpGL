@@ -52,6 +52,54 @@ namespace SharpGL.Drawing
 			VEO = -1;
 			
 		}
+		public List<float> GetVertices(string hintName = "_pos")
+		{
+			List<float> v;
+			var hints = from x in drawHints where x.attributeName == hintName select x;
+			if (hints == null ? true : hints.Count() < 1)
+			{
+				if (indices == null)
+				{
+					v = new List<float>(vertices);
+				}
+				else
+				{
+					v = new List<float>();
+					for(int i = 0; i < indices.Length; i++)
+					{
+						v.Add(vertices[indices[i]]);
+						v.Add(vertices[indices[i+1]]);
+						v.Add(vertices[indices[i+2]]);
+					}
+				}
+			}
+			else
+			{
+				v = new List<float>();
+				var hint = hints.First();
+				if (indices == null)
+				{
+					for (int i = hint.offset; i < vertices.Length; i += hint.stride)
+					{
+						for (int j = 0; j < hint.components; j++)
+						{
+							v.Add(vertices[i + j]);
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < indices.Length; i++)
+					{
+						long index = indices[i] * hint.stride + hint.offset;
+						for (int j = 0; j < hint.components; j++)
+							v.Add(vertices[index+j]);
+						
+					}
+				}
+			}
+			return v;
+		}
 		public void SetDrawHints(params VertexObjectDrawHint[] drawHints)
 		{
 			this.drawHints = drawHints;

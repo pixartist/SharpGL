@@ -13,15 +13,15 @@ using SharpGL.Drawing;
 namespace SharpGL.Drawing
 {
 	public class Gui : MeshRenderer
-{
+	{
 
 		public float CameraDistance { get; set; }
 		public bool Modified { get; private set; }
 		public bool BlendAdditive { get; set; }
 		private Surface drawBuffer;
-		internal override void Init()
+		protected override void OnInit()
 		{
-			base.Init();
+			base.OnInit();
 			BlendAdditive = false;
 		}
 		public void Setup(int width, int height)
@@ -35,24 +35,24 @@ namespace SharpGL.Drawing
 				Mesh = GameObject.App.PrimitiveFactory.Plane;//.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
 				drawBuffer = new Surface(width, height, new SurfaceFormat { DepthBuffer = false, MipMapping = true });
 				Material = new Drawing.Material(App.Shaders["unlit"], RenderMode.Translucent);
-				
+
 				Material.AddTexture("_tex", drawBuffer);
 				PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
-				drawBuffer.Clear(1,0,0,1);
+				drawBuffer.Clear(1, 0, 0, 1);
 			}
 			Modified = true;
 		}
 		public override void OnPreDraw()
 		{
-			if(Modified)
+			if (Modified)
 			{
 				//drawBuffer.BindTexture();
 				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 				//GL.BindTexture(TextureTarget.Texture2D, 0);
 				Modified = false;
 			}
-			if(BlendAdditive)
-				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One); 
+			if (BlendAdditive)
+				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 		}
 		public override void OnPostDraw()
 		{
@@ -73,6 +73,11 @@ namespace SharpGL.Drawing
 		{
 			font.DrawString(drawBuffer, App.Shaders["text"], text, charDistance, position, Vector4.One);
 			Modified = true;
+		}
+		public override void OnDestroy()
+		{
+			drawBuffer.Dispose();
+			base.OnDestroy();
 		}
 	}
 }

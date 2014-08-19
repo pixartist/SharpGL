@@ -10,7 +10,6 @@ uniform sampler2D _tex;
 void main() {
     gl_Position = vec4(_pos, 0, 1);
 	texCoord = _pos/2+vec2(0.5,0.5);
-	texCoord.y = 1 - texCoord.y;
 }
 [Shader fragment]
 #version 150 core

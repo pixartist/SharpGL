@@ -183,6 +183,18 @@ namespace SharpGL.Components
 				}
 				return LocalPosition;
 			}
+			set
+			{
+				Transform p;
+				if (TryGetParent(out p))
+				{
+					LocalPosition = value - p.Position;
+				}
+				else
+				{
+					LocalPosition = value;
+				}
+			}
 		}
 		public virtual Vector3 LocalScale { get; set; }
 		public virtual Vector3 Scale
@@ -208,6 +220,18 @@ namespace SharpGL.Components
 					return Quaternion.Multiply(p.Rotation, LocalRotation);
 				}
 				return LocalRotation;
+			}
+			set
+			{
+				Transform p;
+				if (TryGetParent(out p))
+				{
+					LocalRotation = Quaternion.Multiply(value, p.Rotation.Inverted());
+				}
+				else
+				{
+					LocalRotation = value;
+				}
 			}
 		}
 		public virtual Quaternion LocalRotation
@@ -251,7 +275,7 @@ namespace SharpGL.Components
 				return LocalRotation.ToEuler();
 			}
 		}
-		internal override void Init()
+		protected override void OnInit()
 		{
 			LocalPosition = Vector3.Zero;
 			LocalRotation = Quaternion.Identity;
@@ -281,6 +305,7 @@ namespace SharpGL.Components
 		{
 			LocalRotation = Quaternion.FromAxisAngle(axis, angle) * LocalRotation;
 		}
+		
 	}
 }
 

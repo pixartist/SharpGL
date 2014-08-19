@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using SharpGL.Components;
 namespace SharpGL
 {
-	public class GameObject
+	public class GameObject : DestructableObject
 	{
-		public App App { get; private set; }
 		public Transform Transform
 		{
 			get
@@ -42,26 +41,44 @@ namespace SharpGL
 				throw (new InvalidOperationException("A component of this type already exists."));
 			Component c = (Component)Activator.CreateInstance(t);
 			components.Add(t, c);
-			c.GameObject = this;
-			c.Init();
+			c.Init(this);
 			return (T)c;
 		}
 		internal void RemoveComponent(Component c)
 		{
 			components.Remove(c.GetType());
 		}
-		public void Destroy()
+		internal void Update(float dt)
 		{
-			Parent.children.Remove(this);
+			if(Math.Abs(Transform.Position.X) >= App.WorldSize.X || Math.Abs(Transform.Position.Y) >= App.WorldSize.Y || Math.Abs(Transform.Position.Z) >= App.WorldSize.Z)
+			{
+				Destroy();
+			}
+			foreach (var c in components.Values)
+				c.Update();
+			foreach (var c in children)
+				c.Update(dt);
+		}
+		protected override void PreDestruction()
+		{
+			if (Parent != null)
+				Parent.children.Remove(this);
+		}
+		internal override void DestroyInternalRecursive()
+		{
+			
 			var comps = components.Values.ToArray<Component>();
-			foreach(var c in comps)
+			foreach (var c in comps)
 			{
-				c.Destroy();
+				c.OnDestroy();
+				c.DestroyInternalRecursive();
 			}
-			foreach(var c in children)
+			foreach (var c in children)
 			{
-				c.Destroy();
+				c.OnDestroy();
+				c.DestroyInternalRecursive();
 			}
+			base.DestroyInternalRecursive();
 		}
 		public T Component<T>() where T : Component
 		{

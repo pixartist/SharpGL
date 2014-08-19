@@ -71,6 +71,5 @@ namespace SharpGL.Drawing
 			font.DrawString(Surface, shader, text, charDistance, position, Vector4.One);
 			//Modified = true;
 		}
-		
 	}
 }
