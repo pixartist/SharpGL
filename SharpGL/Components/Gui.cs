@@ -77,6 +77,7 @@ namespace SharpGL.Drawing
 		public override void OnDestroy()
 		{
 			drawBuffer.Dispose();
+			drawBuffer = null;
 			base.OnDestroy();
 		}
 	}

@@ -40,7 +40,6 @@ namespace SharpGL.Drawing
 					dict.Add(renderer.Material, renderers);
 				}
 				renderers.Add(renderer);
-				Console.WriteLine("Added  Renderer " + renderer.GameObject.Name);
 			}
 		}
 		public void RemoveRenderer(MeshRenderer renderer)
@@ -54,7 +53,6 @@ namespace SharpGL.Drawing
 					if (dict.TryGetValue(renderer.Material, out renderers))
 					{
 						renderers.Remove(renderer);
-						Console.WriteLine("Removed Renderer " + renderer.GameObject.Name);
 					}
 				}
 			}
@@ -92,23 +90,26 @@ namespace SharpGL.Drawing
 
 					foreach (var mat in mesh.Value)
 					{
-						mat.Key.Use();
-						mat.Key.Shader.SetUniform<float>("_time", time);
-						mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
-						mesh.Key.ApplyDrawHints(mat.Key.Shader);
-						foreach (var c in mat.Value)
+						if (mat.Value.Count > 0)
 						{
-							//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
-							mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
-							c.ApplyParameters(mat.Key.Shader);
-							if (mesh.Key.VEO > 0)
-								GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
-							else
-								GL.DrawArrays(c.PrimitiveType, 0, elementCount);
+							mat.Key.Use();
+							mat.Key.Shader.SetUniform<float>("_time", time);
+							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							foreach (var c in mat.Value)
+							{
+								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
+								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+								c.ApplyParameters(mat.Key.Shader);
+								if (mesh.Key.VEO > 0)
+									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
+								else
+									GL.DrawArrays(c.PrimitiveType, 0, elementCount);
 
 
+							}
+							GL.UseProgram(0);
 						}
-						GL.UseProgram(0);
 					}
 				}
 			}

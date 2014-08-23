@@ -24,6 +24,7 @@ namespace ModernShaders
 		private Surface multisampler;
 		private MeshRenderer planeRenderer;
 		private Canvas canvas;
+		private PlayerControllerFPS playerController;
 		public ShaderGame(int width, int height) : base(width, height)
 		{
 			
@@ -31,19 +32,19 @@ namespace ModernShaders
 		public override void OnLoad()
 		{
 			//handle movement
-			float camSpeed = 0.05f;
-			KeyboardHandler.RegisterKeyDown(Key.W, () => { ActiveCamera.MoveForward(camSpeed); });
-			KeyboardHandler.RegisterKeyDown(Key.S, () => { ActiveCamera.MoveForward(-camSpeed); });
-			KeyboardHandler.RegisterKeyDown(Key.A, () => { ActiveCamera.MoveRight(-camSpeed); });
-			KeyboardHandler.RegisterKeyDown(Key.D, () => { ActiveCamera.MoveRight(camSpeed); });
-			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => { ActiveCamera.Translate(new Vector3(0, -camSpeed, 0)); });
-			KeyboardHandler.RegisterKeyDown(Key.Space, () => { ActiveCamera.Translate(new Vector3(0, camSpeed, 0)); });
+			
+			KeyboardHandler.RegisterKeyDown(Key.W, () => { playerController.MoveForwardHorizontal(); });
+			KeyboardHandler.RegisterKeyDown(Key.S, () => { playerController.MoveBackHorizontal(); });
+			KeyboardHandler.RegisterKeyDown(Key.A, () => { playerController.MoveLeft(); });
+			KeyboardHandler.RegisterKeyDown(Key.D, () => { playerController.MoveRight(); });
+			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => { playerController.Translate(-Vector3.UnitY); });
+			KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Translate(Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.Escape, () => { Window.Close();});
-			KeyboardHandler.RegisterKeyDown(Key.Q, () => { ActiveCamera.Transform.LocalRotation = ActiveCamera.Transform.LocalPosition.LookAt(Vector3.Zero, Vector3.UnitY); });
+			//KeyboardHandler.RegisterKeyDown(Key.Q, () => { ActiveCamera.Transform.LocalRotation = ActiveCamera.Transform.LocalPosition.LookAt(Vector3.Zero, Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.E, () =>
 			{
 				Vector2 sp = new Vector2(MouseHandler.X, MouseHandler.Y);
-				GameObjectFactory.CreateCube(ActiveCamera.Transform.LocalPosition + ActiveCamera.Transform.Forward * 4f, new Vector3(Mathf.Rnd, Mathf.Rnd, Mathf.Rnd)); //
+				GameObjectFactory.CreateCube(ActiveCamera.Transform.LocalPosition + ActiveCamera.Transform.LocalForward * 4f, new Vector3(Mathf.Rnd, Mathf.Rnd, Mathf.Rnd)); //
 				
 			});
 			MouseHandler.OnMouseMove += MouseHandler_OnMouseMove;
@@ -61,7 +62,8 @@ namespace ModernShaders
 			//Setup font
 			defaultFont = new Font("arial", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ß!\"§$%&/()=?`+#*'äüö-.,:; ", 68);
 			//Setup Camera
-			ActiveCamera.TransAccel = 10f;
+			ActiveCamera.GameObject.Transform.Position = new Vector3(4, 3, 4);
+			playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
 			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
 			sf.Multisampling = 4;
@@ -69,7 +71,7 @@ namespace ModernShaders
 
 			postEffect = new Material(Shaders["screenCA"], RenderMode.Opaque);
 			sf = SurfaceFormat.Surface2D;
-			sf.WrapMode = TextureWrapMode.Clamp;
+			sf.WrapMode = TextureWrapMode.MirroredRepeat;
 			postEffect.AddTexture("_tex", new Surface(Window.Width, Window.Height, sf));
 			postEffect.Parameters.SetParameter<float>("baseBlur", 0f);
 			postEffect.Parameters.SetParameter<float>("blur", 2f);
@@ -77,7 +79,7 @@ namespace ModernShaders
 
 			//Create base plate
 			var prb = GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero).AddComponent<Rigidbody>();
-			prb.SetCollisionBox(new Vector3(15,0.02f,15), new Vector3(7.5f, -0.01f, 7.5f));
+			prb.SetCollisionBox(new Vector3(15,0.5f,15), new Vector3(7.5f, -0.25f, 7.5f));
 			prb.Body.IsStatic = true;
 			//Create sun image plane
 			Surface sun = new Surface("sun.png");
@@ -95,7 +97,7 @@ namespace ModernShaders
 			Vector2 ss = ActiveCamera.NearplaneSize;
 			guiObj.Transform.LocalPosition = new Vector3(ss.X/-2,ss.Y/2,-(ActiveCamera.ZNear + 0.001f));
 			gui.Transform.LocalScale = new Vector3(ss.X, 1, ss.Y);
-			guiObj.Transform.Rotate(guiObj.Transform.Right, Mathf.Deg2Rad(90));
+			guiObj.Transform.Rotate(guiObj.Transform.LocalRight, Mathf.Deg2Rad(90));
 			CameraContainer.AddChild(guiObj);
 
 			
@@ -141,7 +143,7 @@ namespace ModernShaders
 			float vRot = (delta.Y / Window.Width) * 18f;
 
 			ActiveCamera.Rotate(Vector3.UnitY, hRot*1);
-			ActiveCamera.Rotate(ActiveCamera.Transform.Right, vRot*1);
+			ActiveCamera.Rotate(ActiveCamera.Transform.LocalRight, vRot*1);
 		}
 		public override void OnDraw(float time)
 		{

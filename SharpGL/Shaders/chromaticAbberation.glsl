@@ -65,4 +65,5 @@ void main()
 	pb += h;
 	float bAmount = min(baseBlur + blur*dFromCenter, 16);
 	outColor = effect(pr, pos, pb, size, bAmount) * (1-dFromCenter);
+
 }

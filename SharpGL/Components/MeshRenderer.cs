@@ -96,6 +96,7 @@ namespace SharpGL.Components
 		}
 		public override void OnDestroy()
 		{
+			Mesh = null;
 			App.SceneRenderer.RemoveRenderer(this);
 		}
 	}

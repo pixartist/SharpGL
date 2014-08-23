@@ -19,12 +19,6 @@ namespace SharpGL.Components
 		private float fov;
 		
 		protected Matrix4 projectionMatrix;
-		public Vector3 PositionTarget { get; set; }
-		public Quaternion RotationTarget { get; set; }
-		public float TransAccel { get; set; }
-		public float RotAccel { get; set; }
-		public bool LerpRotation { get; set; }
-		public bool LerpTranslation { get; set; }
 		public bool PitchLock { get; set; }
 		
 		
@@ -77,11 +71,6 @@ namespace SharpGL.Components
 		public float AspectRatio { get; private set; }
 		protected override void OnInit()
 		{
-			RotationTarget = Quaternion.Identity;
-			LerpRotation = false;
-			LerpTranslation = true;
-			TransAccel = 1;
-			RotAccel = 1;
 			PitchLock = true;
 			fov = 90;
 			zNear = 0.1f;
@@ -96,76 +85,20 @@ namespace SharpGL.Components
 			Matrix4 p = projectionMatrix;
 			return m * v * p;
 		}
-		public void Update(float tDelta)
-		{
-			if(LerpTranslation)
-				Transform.LocalPosition += (PositionTarget - Transform.LocalPosition) * Math.Min(1, tDelta * TransAccel);
-			if (LerpRotation)
-			{
-				Transform.LocalRotation = Quaternion.Slerp(Transform.LocalRotation, RotationTarget, Math.Min(1, RotAccel * tDelta));
-				
-			}
-		}
-		public void MoveForward(float amount)
-		{
-			if (LerpTranslation)
-			{
-				TranslateTargetPosition(Transform.Forward * amount);
-			}
-			else
-			{
-				Transform.Translate(Transform.Forward * amount);
-			}
-		}
-		public void MoveRight(float amount)
-		{
-			if (LerpTranslation)
-			{
-				TranslateTargetPosition(Transform.Right * amount);
-			}
-			else
-			{
-				Transform.Translate(Transform.Right * amount);
-			}
-		}
-		public void MoveUp(float amount)
-		{
-			if (LerpTranslation)
-			{
-				TranslateTargetPosition(Transform.Up* amount);
-			}
-			else
-			{
-				Transform.Translate(Transform.Up * amount);
-			}
-		}
-		public void Translate(Vector3 amount)
-		{
-			if (LerpTranslation)
-			{
-				TranslateTargetPosition(amount);
-			}
-			else
-			{
-				Transform.Translate(amount);
-			}
-		}
-		private void TranslateTargetPosition(Vector3 amount)
-		{
-			PositionTarget += amount;
-		}
+		
+		
+		
 		
 		public void Rotate(Vector3 axis, float angle)
 		{
-			
 			Transform.Rotate(axis, angle);
 			if (PitchLock)
 			{
-				float a = Vector3.CalculateAngle(Vector3.UnitY, Transform.Up);
-				float sign =  -Math.Sign(Transform.Forward.Y);
-				float delta = a - (float)Math.PI / 2;
+				float a = Vector3.CalculateAngle(Vector3.UnitY, Transform.LocalUp);
+				float sign =  -Math.Sign(Transform.LocalForward.Y);
+				float delta = a - ((float)Math.PI / 2 - 0.1f);
 				if (delta > 0)
-					Transform.Rotate(Transform.Right, delta * sign);
+					Transform.Rotate(Transform.LocalRight, delta * sign);
 			}
 		}
 		

@@ -20,11 +20,11 @@ namespace SharpGL.Components
 		
 		public static Quaternion LookDirection(this Vector3 direction, Vector3 up)
 		{
-			return Matrix4.LookAt(direction, Vector3.Zero, Vector3.UnitY).ToQuaternion().Inverted();
+			return Matrix4.LookAt(direction, Vector3.Zero, Vector3.UnitY).ToQuaternion();
 		}
 		public static Quaternion LookAt(this Vector3 from, Vector3 target, Vector3 up)
 		{
-			return Matrix4.LookAt(from, target, Vector3.UnitY).ToQuaternion().Inverted();
+			return Matrix4.LookAt(from, target, Vector3.UnitY).ToQuaternion();
 		}
 		public static Matrix4 ToMatrix4(this Quaternion q)
 		{
@@ -246,7 +246,7 @@ namespace SharpGL.Components
 				_rotation.Normalize();
 			}
 		}
-		public virtual Vector3 Right
+		public virtual Vector3 LocalRight
 		{
 			get
 			{
@@ -254,14 +254,14 @@ namespace SharpGL.Components
 				return Vector3.Transform(Vector3.UnitX, LocalRotation);
 			}
 		}
-		public virtual Vector3 Forward
+		public virtual Vector3 LocalForward
 		{
 			get
 			{
 				return Vector3.Transform(-Vector3.UnitZ, LocalRotation);
 			}
 		}
-		public virtual Vector3 Up
+		public virtual Vector3 LocalUp
 		{
 			get
 			{

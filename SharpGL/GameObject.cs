@@ -55,7 +55,7 @@ namespace SharpGL
 				Destroy();
 			}
 			foreach (var c in components.Values)
-				c.Update();
+				c.Update(dt);
 			foreach (var c in children)
 				c.Update(dt);
 		}

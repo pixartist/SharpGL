@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -12,6 +13,7 @@ using SharpGL.Drawing;
 using SharpGL.Input;
 using SharpGL.Components;
 using SharpGL.Factories;
+
 namespace SharpGL
 {
 	public class App
@@ -88,7 +90,7 @@ namespace SharpGL
 		public float DT { get; private set; }
         public App(int width, int height)
         {
-			WorldSize = new Vector3(20, 20, 20);
+			WorldSize = new Vector3(200, 200, 200);
 			lastTime = 0;
 			SceneRoot = new GameObject("SceneRoot", this);
 			Shaders = new Dictionary<string, Shader>();
@@ -107,7 +109,6 @@ namespace SharpGL
 			
 			var cameraContainer = CreateGameObject("Camera");
 			ActiveCamera = cameraContainer.AddComponent<Camera>();
-			ActiveCamera.TransAccel = 4f;
 			stopWatch = new System.Diagnostics.Stopwatch();
 			stopWatch.Start();
 			time = new System.Diagnostics.Stopwatch();
@@ -122,8 +123,10 @@ namespace SharpGL
 
 			GameObjectFactory = new GameObjectFactory(this);
 			PrimitiveFactory = new PrimitiveFactory();
-
-			PhysicsWorld = new Jitter.World(new Jitter.Collision.CollisionSystemSAP());
+			var cs = new Jitter.Collision.CollisionSystemPersistentSAP();
+			
+			PhysicsWorld = new Jitter.World(cs);
+			
 			PhysicsWorld.Gravity = new Jitter.LinearMath.JVector(0, -9.81f, 0);
 
 

@@ -22,9 +22,9 @@ namespace SharpGL.Components
 		{
 			
 		}
-		internal void Update()
+		internal void Update(float dt)
 		{
-			OnUpdate();
+			OnUpdate(dt);
 		}
 		internal void Init(GameObject parent)
 		{
@@ -36,7 +36,7 @@ namespace SharpGL.Components
 		{
 
 		}
-		protected virtual void OnUpdate()
+		protected virtual void OnUpdate(float dt)
 		{
 
 		}
