@@ -293,6 +293,13 @@ namespace SharpGL.Components
 			Matrix4 scale = Matrix4.CreateScale(Scale);
 			return scale * rotation * translation;
 		}
+        public virtual Matrix4 GetMatrixInverse()
+        {
+            Matrix4 translation = Matrix4.CreateTranslation(Position);
+            Matrix4 rotation = Matrix4.CreateFromQuaternion(Rotation);
+            Matrix4 scale = Matrix4.CreateScale(Scale);
+            return translation * rotation;
+        }
 		public virtual void Translate(Vector3 amount)
 		{
 			LocalPosition += amount;

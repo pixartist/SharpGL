@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>PhysX.Net-x64</id>
+    <version>0.2.0</version>
+    <authors>StillDesign</authors>
+    <owners>StillDesign</owners>
+    <projectUrl>https://github.com/stilldesign/PhysX.Net</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.NET wrapper for NVIDIA PhysX 3.3.1</description>
+    <language>en-US</language>
+    <tags>nvidia physx wrapper physics</tags>
+  </metadata>
+</package>

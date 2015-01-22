@@ -16,7 +16,22 @@ namespace SharpGL
 			}
 		}
 		public string Name { get; set; }
-		public GameObject Parent { get; private set; }
+		public GameObject Parent
+        {
+            get
+            {
+                return parent;
+            }
+            set
+            {
+                if (parent != null)
+                    parent.children.Remove(this);
+                if (value != null)
+                    value.children.Add(this);
+                parent = value;
+            }
+        }
+        private GameObject parent;
 		private List<GameObject> children;
 		private Dictionary<Type, Component> components;
 		internal GameObject(string name, App app)
@@ -26,12 +41,6 @@ namespace SharpGL
 			children = new List<GameObject>();
 			components = new Dictionary<Type, Component>();
 			AddComponent<Transform>();
-		}
-		public GameObject AddChild(GameObject child)
-		{
-			children.Add(child);
-			child.Parent = this;
-			return child;
 		}
 		public T AddComponent<T>() where T : Component
 		{

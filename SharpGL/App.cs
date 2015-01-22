@@ -37,7 +37,7 @@ namespace SharpGL
 		/// <summary>
 		/// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
 		/// </summary>
-		public Jitter.World PhysicsWorld { get; protected set; }
+		public BulletSharp.DiscreteDynamicsWorld PhysicsWorld { get; protected set; }
 		public Vector3 WorldSize { get; set; }
 		public SceneRenderer SceneRenderer { get; protected set; }
 
@@ -102,6 +102,7 @@ namespace SharpGL
             Window = new GameWindow(width, height, new GraphicsMode(32, 24,0, 0));
             Window.Load += OnLoadInternal;
             Window.Resize += OnResizeInternal;
+            Window.Closing += Window_Closing;
             Window.UpdateFrame += OnUpdateInternal;
             Window.RenderFrame += OnRenderInternal;
 			SceneRenderer = new SceneRenderer(this);
@@ -125,13 +126,27 @@ namespace SharpGL
 			PrimitiveFactory = new PrimitiveFactory();
 			var cs = new Jitter.Collision.CollisionSystemPersistentSAP();
 			
-			PhysicsWorld = new Jitter.World(cs);
+			//PhysicsWorld = new Jitter.World(cs);
 			
-			PhysicsWorld.Gravity = new Jitter.LinearMath.JVector(0, -9.81f, 0);
+			//PhysicsWorld.Gravity = new Jitter.LinearMath.JVector(0, -9.81f, 0);
+            
+            var collisionConfig = new BulletSharp.DefaultCollisionConfiguration();
+            PhysicsWorld = new BulletSharp.DiscreteDynamicsWorld(
+                new BulletSharp.CollisionDispatcher(collisionConfig), 
+                new BulletSharp.DbvtBroadphase(), 
+                new BulletSharp.SequentialImpulseConstraintSolver(), 
+                collisionConfig);
 
 
 			Window.Run(60.0);
 			
+        }
+
+        void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (PhysicsWorld != null)
+                PhysicsWorld.Dispose();
+            OnClosing();
         }
 		/// <summary>
 		/// Creates a new empty game object
@@ -140,7 +155,9 @@ namespace SharpGL
 		/// <returns></returns>
         public GameObject CreateGameObject(string name)
 		{
-			return SceneRoot.AddChild(new GameObject(name, this));
+            var go = new GameObject(name, this);
+            go.Parent = SceneRoot;
+            return go;
 		}
 		public void DestroyGameObject(GameObject gameObject)
 		{
@@ -171,9 +188,11 @@ namespace SharpGL
 			MouseHandler.Update();
             KeyboardHandler.Update();
 			OnUpdate();
+            SceneRoot.Update(DT);
 			if (PhysicsWorld != null)
-				PhysicsWorld.Step(DT, true);
-			SceneRoot.Update(DT);
+				PhysicsWorld.StepSimulation(DT);
+				//PhysicsWorld.Step(DT, true);
+			
             
 			foreach(var c in destroyed)
 			{
@@ -222,6 +241,7 @@ namespace SharpGL
 		/// Called every update
 		/// </summary>
         public virtual void OnUpdate() { }
+        public virtual void OnClosing() { }
 		public virtual void OnDraw(float time) 
 		{
 

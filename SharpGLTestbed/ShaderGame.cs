@@ -12,6 +12,7 @@ using SharpGL.Drawing;
 using SharpGL.Input;
 using SharpGL.Components;
 using SharpGL.Factories;
+using SharpGL.Components.BulletPhysics;
 using System.Threading;
 namespace ModernShaders
 {
@@ -25,6 +26,7 @@ namespace ModernShaders
 		private MeshRenderer planeRenderer;
 		private Canvas canvas;
 		private PlayerControllerFPS playerController;
+        private Random rnd;
 		public ShaderGame(int width, int height) : base(width, height)
 		{
 			
@@ -32,20 +34,22 @@ namespace ModernShaders
 		public override void OnLoad()
 		{
 			//handle movement
-			
-			KeyboardHandler.RegisterKeyDown(Key.W, () => { playerController.MoveForwardHorizontal(); });
-			KeyboardHandler.RegisterKeyDown(Key.S, () => { playerController.MoveBackHorizontal(); });
+			rnd = new Random();
+			KeyboardHandler.RegisterKeyDown(Key.W, () => { playerController.MoveForward(); });
+			KeyboardHandler.RegisterKeyDown(Key.S, () => { playerController.MoveBack(); });
 			KeyboardHandler.RegisterKeyDown(Key.A, () => { playerController.MoveLeft(); });
 			KeyboardHandler.RegisterKeyDown(Key.D, () => { playerController.MoveRight(); });
-			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => { playerController.Translate(-Vector3.UnitY); });
-			KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Translate(Vector3.UnitY); });
+			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => {  /*playerController.Translate(-Vector3.UnitY);*/ });
+            KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Jump(); /*playerController.Translate(Vector3.UnitY);*/ });
 			KeyboardHandler.RegisterKeyDown(Key.Escape, () => { Window.Close();});
+            MouseHandler.MouseLocked = true;
+            MouseHandler.CursorVisible = false;
 			//KeyboardHandler.RegisterKeyDown(Key.Q, () => { ActiveCamera.Transform.LocalRotation = ActiveCamera.Transform.LocalPosition.LookAt(Vector3.Zero, Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.E, () =>
 			{
 				Vector2 sp = new Vector2(MouseHandler.X, MouseHandler.Y);
 				GameObjectFactory.CreateCube(ActiveCamera.Transform.LocalPosition + ActiveCamera.Transform.LocalForward * 4f, new Vector3(Mathf.Rnd, Mathf.Rnd, Mathf.Rnd)); //
-				
+                
 			});
 			MouseHandler.OnMouseMove += MouseHandler_OnMouseMove;
 			MouseHandler.RegisterButtonDown(MouseButton.Left, () =>
@@ -53,7 +57,7 @@ namespace ModernShaders
 				Vector2 sp = new Vector2(MouseHandler.X, MouseHandler.Y);
 				var go = GameObjectFactory.CreateCube(ActiveCamera.Transform.LocalPosition + ActiveCamera.ScreenToDirection(sp) * 2f, new Vector3(0.3f, 0.3f, 0.3f)); //
 				go.Component<MeshRenderer>().Parameters.SetParameter<float>("_color", Mathf.Rnd, Mathf.Rnd, Mathf.Rnd, 1);
-				go.AddComponent<Rigidbody>().SetCollisionBox(Vector3.One * 0.3f, Vector3.One * 0.15f);
+				go.AddComponent<Rigidbody>().SetCollisionBox(Vector3.One * 0.15f, Vector3.One * 0.3f);
 			});
 
 			Log.ShowDebug = true;
@@ -62,11 +66,12 @@ namespace ModernShaders
 			//Setup font
 			defaultFont = new Font("arial", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ß!\"§$%&/()=?`+#*'äüö-.,:; ", 68);
 			//Setup Camera
+            
 			ActiveCamera.GameObject.Transform.Position = new Vector3(4, 3, 4);
-			playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
+            playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
 			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
-			sf.Multisampling = 4;
+			sf.Multisampling = 1;
 			multisampler = new Surface(Window.Width, Window.Height, sf);
 
 			postEffect = new Material(Shaders["screenCA"], RenderMode.Opaque);
@@ -78,18 +83,19 @@ namespace ModernShaders
 			postEffect.Parameters.SetParameter<float>("chromatic", 0.1f);
 
 			//Create base plate
-			var prb = GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero).AddComponent<Rigidbody>();
-			prb.SetCollisionBox(new Vector3(15,0.5f,15), new Vector3(7.5f, -0.25f, 7.5f));
-			prb.Body.IsStatic = true;
+            var prb = GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero).AddComponent<Rigidbody>();
+            prb.SetCollisionBox(new Vector3(7.5f, -0.25f, 7.5f), new Vector3(15, 1f, 15));
+            prb.MakeStatic();
 			//Create sun image plane
 			Surface sun = new Surface("sun.png");
 			(GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 1, 0)).Component<MeshRenderer>().Material = new Material(Shaders["unlit"], RenderMode.Translucent)).AddTexture("_tex", sun);
 			//red cube
-			var cu = GameObjectFactory.CreateCube(Vector3.Zero, Vector3.One);
+			var cu = GameObjectFactory.CreateCube(new Vector3(0,8.5f,0), Vector3.One*2f);
 			cu.Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
-			prb = cu.AddComponent<Rigidbody>();
-			prb.SetCollisionConvexMesh(cu.Component<MeshRenderer>().Mesh, cu.Transform.Scale, new Vector3(0.5f, 0.5f, 0.5f));
-			prb.Body.IsStatic = true;
+            prb = cu.AddComponent<Rigidbody>();
+            prb.SetCollisionConvexMesh(cu.Component<MeshRenderer>().Mesh, Vector3.One * 0.5f, cu.Transform.Scale);
+            prb.SetMass(8.0f);
+			//prb.Body.IsStatic = true;
 			//Create gui
 			var guiObj = CreateGameObject("GUI");
 			gui = guiObj.AddComponent<Gui>();
@@ -98,13 +104,13 @@ namespace ModernShaders
 			guiObj.Transform.LocalPosition = new Vector3(ss.X/-2,ss.Y/2,-(ActiveCamera.ZNear + 0.001f));
 			gui.Transform.LocalScale = new Vector3(ss.X, 1, ss.Y);
 			guiObj.Transform.Rotate(guiObj.Transform.LocalRight, Mathf.Deg2Rad(90));
-			CameraContainer.AddChild(guiObj);
+            guiObj.Parent = CameraContainer;
 
 			
 			
 			//setup rotating cubes
 			rotator = GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One);
-			rotator.AddChild(GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One));
+            GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One).Parent = rotator;
 			
 			//Create plane for camera image displaying
 			canvas = new Canvas(1024,1024, false);
@@ -123,9 +129,9 @@ namespace ModernShaders
 			Log.Write(GL.GetError().ToString());
 
 			//physics 
-			var vcube = GameObjectFactory.CreateCube(new Vector3(-0.3f, 2, -0.3f), Vector3.One * 2);
-			prb = vcube.AddComponent<Rigidbody>();
-			prb.SetCollisionConvexMesh(vcube.Component<MeshRenderer>().Mesh, vcube.Transform.Scale, new Vector3(1f, 1f, 1f));
+			//var vcube = GameObjectFactory.CreateCube(new Vector3(-0.3f, 2, -0.3f), Vector3.One * 2);
+			//prb = vcube.AddComponent<BulletRigidbody>();
+           // prb.SetCollisionConvexMesh(vcube.Component<MeshRenderer>().Mesh, new Vector3(1f, 1f, 1f), vcube.Transform.Scale);
 			
 		}
 
@@ -149,7 +155,7 @@ namespace ModernShaders
 		{
 			//Render gui text
 			gui.Material.Textures["_tex"].Clear();
-			Vector2 p = ActiveCamera.WorldToScreen(new Vector3(0, 0, 0));
+			Vector2 p = ActiveCamera.WorldToScreen(new Vector3(10, 0, 10));
 			gui.DrawText("Time: " + time, defaultFont, 0.6f, p, new Vector4(1, 0.5f, 0.5f, 1));
 			gui.DrawText("FPS:  " + Fps, defaultFont, 0.6f, new Vector2(p.X, p.Y + 100), new Vector4(1, 0.5f, 0.5f, 1));
 			

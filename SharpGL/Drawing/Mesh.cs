@@ -52,7 +52,35 @@ namespace SharpGL.Drawing
 			VEO = -1;
 			
 		}
-		public List<float> GetVertices(string hintName = "_pos")
+        public List<Vector3> GetPoints(string hintName = "_pos")
+        {
+            List<Vector3> v = new List<Vector3>();
+            var hints = from x in drawHints where x.attributeName == hintName select x;
+            //no hints given, iterate vertices freely
+            if (hints == null ? true : hints.Count() < 1)
+            {
+
+                for (int i = 0; i < vertices.Length-2; i++)
+                {
+                    v.Add(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]));
+                }
+          
+            }
+            else //use hints
+            {
+                var hint = hints.First();
+                //must be a 3-component system
+                if (hint.components != 3)
+                    throw (new InvalidOperationException("Vertices must have 3 components"));
+
+                for (int i = hint.offset; i < vertices.Length - 2; i += hint.stride)
+                {
+                    v.Add(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]));
+                }
+            }
+            return v;
+        }
+		public List<float> GetIndexedVertexComponentArray(string hintName = "_pos")
 		{
 			List<float> v;
 			var hints = from x in drawHints where x.attributeName == hintName select x;
@@ -65,7 +93,7 @@ namespace SharpGL.Drawing
 				else
 				{
 					v = new List<float>();
-					for(int i = 0; i < indices.Length; i++)
+					for(int i = 0; i < indices.Length-2; i++)
 					{
 						v.Add(vertices[indices[i]]);
 						v.Add(vertices[indices[i+1]]);

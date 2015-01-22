@@ -5,13 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
+using System.Windows.Forms;
+using System.Drawing;
 namespace SharpGL.Input
 {
 	public class MouseHandler
 	{
+        public static bool CursorVisible
+        { 
+            get
+            {
+                return _window.CursorVisible;
+            }
+            set
+            {
+                _window.CursorVisible = value;
+            }
+        }
+        public static bool MouseLocked { get; set; }
 		private static Dictionary<MouseButton, bool> pressedButtons;
 		private static Dictionary<MouseButton, Action> buttonActions;
 		private static Vector2 mPos, mDelta;
+        private static GameWindow _window;
 		public static float X
 		{
 			get
@@ -30,23 +45,13 @@ namespace SharpGL.Input
 		public static event MouseMoveHandler OnMouseMove;
 		internal static void Init(GameWindow window)
 		{
+            _window = window;
 			window.Mouse.ButtonDown += Mouse_ButtonDown;
 			window.Mouse.ButtonUp += Mouse_ButtonUp;
-			window.Mouse.Move += Mouse_Move;
+           
 			pressedButtons = new Dictionary<MouseButton, bool>();
 			buttonActions = new Dictionary<MouseButton, Action>();
 			
-		}
-
-		static void Mouse_Move(object sender, MouseMoveEventArgs e)
-		{
-			mDelta.X = mPos.X - e.X;
-			mDelta.Y = mPos.Y - e.Y;
-			mPos.X = e.X;
-			mPos.Y = e.Y;
-
-			if (OnMouseMove != null)
-				OnMouseMove(mPos, mDelta);
 		}
 
 		static void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
@@ -71,6 +76,17 @@ namespace SharpGL.Input
 		}
 		internal static void Update()
 		{
+            mDelta.X = mPos.X - Cursor.Position.X;
+            mDelta.Y = mPos.Y - Cursor.Position.Y;
+            if (mDelta.LengthSquared > 0)
+            {
+                if (MouseLocked)
+                    Cursor.Position = new Point(_window.X + _window.Width / 2, _window.Y + _window.Height / 2);
+                mPos.X = Cursor.Position.X;
+                mPos.Y = Cursor.Position.Y;
+                if (OnMouseMove != null)
+                    OnMouseMove(mPos, mDelta);
+            }
 			foreach (MouseButton k in buttonActions.Keys)
 			{
 				if (pressedButtons[k])
