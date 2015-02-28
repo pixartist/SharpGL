@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using SharpGL.Drawing;
 namespace SharpGL
 {
+    /// <summary>
+    /// A ShaderParamCollection holds a collection of shader parameters.
+    /// </summary>
 	public class ShaderParamCollection
 	{
 		public Dictionary<string, ShaderParamBase> Paramters { get; private set; }

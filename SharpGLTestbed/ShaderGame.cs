@@ -42,7 +42,7 @@ namespace ModernShaders
 			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => {  /*playerController.Translate(-Vector3.UnitY);*/ });
             KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Jump(); /*playerController.Translate(Vector3.UnitY);*/ });
 			KeyboardHandler.RegisterKeyDown(Key.Escape, () => { Window.Close();});
-            MouseHandler.MouseLocked = true;
+            //MouseHandler.MouseLocked = true;
             MouseHandler.CursorVisible = false;
 			//KeyboardHandler.RegisterKeyDown(Key.Q, () => { ActiveCamera.Transform.LocalRotation = ActiveCamera.Transform.LocalPosition.LookAt(Vector3.Zero, Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.E, () =>
@@ -62,7 +62,9 @@ namespace ModernShaders
 
 			Log.ShowDebug = true;
 			Log.Debug("Creating gui");
-
+            SceneRenderer.AmbientLight = new Vector3(0.2f, 1, 1);
+            SceneRenderer.SkylightColor = new Vector3(1, 1, 1);
+            SceneRenderer.SkylightDirection = new Vector3(1, 0, 0);
 			//Setup font
 			defaultFont = new Font("arial", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ß!\"§$%&/()=?`+#*'äüö-.,:; ", 68);
 			//Setup Camera
@@ -71,7 +73,7 @@ namespace ModernShaders
             playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
 			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
-			sf.Multisampling = 1;
+			sf.Multisampling = 2;
 			multisampler = new Surface(Window.Width, Window.Height, sf);
 
 			postEffect = new Material(Shaders["screenCA"], RenderMode.Opaque);
@@ -168,6 +170,8 @@ namespace ModernShaders
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			GL.Viewport(0, 0, Window.Width, Window.Height);
 			postEffect.Use();
+            //multisampler.BindTexture();
+            //canvas.Surface.BindTexture();
 			Helper.DrawScreenQuad();
 			GL.UseProgram(0);
 			 

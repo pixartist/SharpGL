@@ -120,11 +120,12 @@ namespace SharpGL
 			Shaders.Add("screenCA", new Shader("Shaders/chromaticAbberation.glsl", "vertex", null, "fragment"));
 			Shaders.Add("text", new Shader("Shaders/text.glsl", "vertex", null, "fragment"));
 			Shaders.Add("gol", new Shader("Shaders/gol.glsl", "vertex", null, "fragment"));
+            Shaders.Add("lit", new Shader("Shaders/lit.glsl", "vertex", null, "fragment"));
 			Materials.Add("unlit", new Material(Shaders["unlit"], RenderMode.Opaque));
-
+            Materials.Add("lit", new Material(Shaders["lit"], RenderMode.Opaque));
 			GameObjectFactory = new GameObjectFactory(this);
 			PrimitiveFactory = new PrimitiveFactory();
-			var cs = new Jitter.Collision.CollisionSystemPersistentSAP();
+			//var cs = new Jitter.Collision.CollisionSystemPersistentSAP();
 			
 			//PhysicsWorld = new Jitter.World(cs);
 			

@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 using SharpGL.Components;
 namespace SharpGL
 {
+    /// <summary>
+    /// A GameObject is the base class for any actor which can be positioned in the game world. Every GameObject has a Transform component which holds the transformation data.
+    /// It also holds a list of children game objects as well as a collection of components
+    /// </summary>
 	public class GameObject : DestructableObject
 	{
+        /// <summary>
+        /// The Transform component of the GameObject
+        /// </summary>
 		public Transform Transform
 		{
 			get
@@ -15,7 +22,14 @@ namespace SharpGL
 				return Component<Transform>();
 			}
 		}
+        /// <summary>
+        /// The name of the GameObject
+        /// </summary>
 		public string Name { get; set; }
+
+        /// <summary>
+        /// The parent GameObject of this GameObject. Null for a root object
+        /// </summary>
 		public GameObject Parent
         {
             get
@@ -42,6 +56,11 @@ namespace SharpGL
 			components = new Dictionary<Type, Component>();
 			AddComponent<Transform>();
 		}
+        /// <summary>
+        /// Adds a component to this GameObject. A GameObject can only hold one component of each type
+        /// </summary>
+        /// <typeparam name="T">The type of the component, must inherit from Component</typeparam>
+        /// <returns>the component object</returns>
 		public T AddComponent<T>() where T : Component
 		{
 
@@ -68,6 +87,9 @@ namespace SharpGL
 			foreach (var c in children)
 				c.Update(dt);
 		}
+        /// <summary>
+        /// Called before an object is destroyed
+        /// </summary>
 		protected override void PreDestruction()
 		{
 			if (Parent != null)
@@ -89,6 +111,11 @@ namespace SharpGL
 			}
 			base.DestroyInternalRecursive();
 		}
+        /// <summary>
+        /// Tries to return a Component of type T
+        /// </summary>
+        /// <typeparam name="T">Type of the component</typeparam>
+        /// <returns>the component of the provided type or null if component does not exist</returns>
 		public T Component<T>() where T : Component
 		{
 			Component tmp;

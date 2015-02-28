@@ -12,12 +12,21 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL
 {
+    /// <summary>
+    /// A Font holds a spritesheet for a font which can be rendered
+    /// </summary>
 	public class Font
 	{
 		private const int maxWidth = 2048;
 		private Dictionary<char, Vector2> charSizes;
 		private Dictionary<char, Vector2> charLocations;
 		private Texture2D texture;
+        /// <summary>
+        /// Creates a Font
+        /// </summary>
+        /// <param name="font">The name of the Font (E.g. "Arial")</param>
+        /// <param name="characters">A string containing the characters the sprite sheet should contain. Only these characters can be rendered.</param>
+        /// <param name="size">Size in points of the font</param>
 		public Font(string font, string characters, float size)
 		{
 			//measure space
@@ -83,11 +92,24 @@ namespace SharpGL
 			}
 		//	fontTarget.Save("test.png",	ImageFormat.Png);
 			BitmapData data = fontTarget.LockBits(new Rectangle(0, 0, fontTarget.Width, fontTarget.Height), ImageLockMode.ReadOnly, fontTarget.PixelFormat);
-			texture = new Texture2D(fontTarget.Width, fontTarget.Height,
-				new SurfaceFormat { Pixels = data.Scan0, DepthBuffer = false, Multisampling = 0, PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra, SourceType = PixelType.UnsignedByte}
-				);
+            SurfaceFormat format = SurfaceFormat.Texture2DAlpha;
+            format.Pixels = data.Scan0;
+            format.DepthBuffer = false;
+            format.Multisampling = 0;
+            format.PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
+            format.SourceType = PixelType.UnsignedByte;
+			texture = new Texture2D(fontTarget.Width, fontTarget.Height,format);
 			fontTarget.UnlockBits(data);
 		}
+        /// <summary>
+        /// Draws a string to a surface.
+        /// </summary>
+        /// <param name="surface">The surface to draw to.</param>
+        /// <param name="shader">The shader to use for drawing.</param>
+        /// <param name="text">The string to draw.</param>
+        /// <param name="charDist">The additional distance between characters. Can be negative.</param>
+        /// <param name="basePos">The location of the string. (Top-left)</param>
+        /// <param name="color">The color to use for drawing.</param>
 		public void DrawString(Surface surface, Shader shader, string text, float charDist, Vector2 basePos, Vector4 color)
 		{
 			float xAt = -1;

@@ -7,6 +7,9 @@ using OpenTK;
 using OpenTK.Input;
 namespace SharpGL.Input
 {
+    /// <summary>
+    /// Manages key presses on the keyboard
+    /// </summary>
     public static class KeyboardHandler
     {
         private static Dictionary<Key, bool> pressedKeys;
@@ -22,16 +25,31 @@ namespace SharpGL.Input
 			keyPressActions = new Dictionary<Key, Action>();
 			keyReleaseActions = new Dictionary<Key, Action>();
         }
+        /// <summary>
+        /// Registers an action to be called if a key is pressed or held down.
+        /// </summary>
+        /// <param name="k">The key</param>
+        /// <param name="action">The action to be called</param>
         public static void RegisterKeyDown(Key k, Action action)
         {
 			RegisterKey(k);
             keyDownActions.Add(k, action);
         }
+        /// <summary>
+        /// Registers an action to be called when a key is pressed.
+        /// </summary>
+        /// <param name="k">The key</param>
+        /// <param name="action">The action to be called</param>
 		public static void RegisterKeyPress(Key k, Action action)
 		{
 			RegisterKey(k);
 			keyPressActions.Add(k, action);
 		}
+        /// <summary>
+        /// Registers an action to be called when a key is released.
+        /// </summary>
+        /// <param name="k">The key</param>
+        /// <param name="action">The action to be called</param>
 		public static void RegisterKeyRelease(Key k, Action action)
 		{
 			RegisterKey(k);

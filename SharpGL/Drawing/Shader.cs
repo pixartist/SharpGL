@@ -11,6 +11,9 @@ using OpenTK.Graphics.OpenGL;
 using SharpGL.Components;
 namespace SharpGL.Drawing
 {
+    /// <summary>
+    /// A draw hint contains information about how to handle given Vertex data in the Shader
+    /// </summary>
 	public struct VertexObjectDrawHint
 	{
 		public string attributeName;
@@ -28,6 +31,9 @@ namespace SharpGL.Drawing
 			this.normalize = normalize;
 		}
 	}
+    /// <summary>
+    /// A Shader creates and binds OpenGL shaders and provides Methods to apply shader parameters
+    /// </summary>
     public class Shader : IDisposable
     {
         const string Identifier = "[Shader %s]";
@@ -80,10 +86,17 @@ namespace SharpGL.Drawing
                 Log.Error("Shader file does not exist: " + filePath);
             }
         }
+        /// <summary>
+        /// Uses the Shader
+        /// </summary>
         public void Use()
         {
             GL.UseProgram(Program);
         }
+        /// <summary>
+        /// Applies vertex attributes
+        /// </summary>
+        /// <param name="drawHints">One or multiple vertex draw hints containing information about how to handle vertex data</param>
 		public void SetVertexAttributes(params VertexObjectDrawHint[] drawHints)
 		{
 			foreach (var h in drawHints)
@@ -176,7 +189,7 @@ namespace SharpGL.Drawing
         }
 		private void ApplyMultiUniform<T>(int location, int length, T[] data)
 		{
-			
+            throw (new NotImplementedException("This is not implemented"));
 		}
         public int GetUniformLoc(string name)
         {
@@ -189,6 +202,11 @@ namespace SharpGL.Drawing
             }
             return loc;
         }
+        /// <summary>
+        /// Applies the shader program to a Surface
+        /// </summary>
+        /// <param name="surface">The surface to be used as source and target</param>
+        /// <param name="parameters">Additional shader parameters</param>
         public void ApplyTo(Surface surface, params ShaderParamBase[] parameters)
         {
 			using (Surface pong = new Surface(surface.Width, surface.Height))
@@ -240,6 +258,12 @@ namespace SharpGL.Drawing
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             }
         }
+        /// <summary>
+        /// Renders the source to the target using this shader
+        /// </summary>
+        /// <param name="source">Source Surface</param>
+        /// <param name="target">Target Surface</param>
+        /// <param name="parameters">Additional shader parameters</param>
         public void ApplyTo(Surface source, Surface target, params ShaderParamBase[] parameters)
         {
             GL.Viewport(0, 0, target.Width, target.Height);

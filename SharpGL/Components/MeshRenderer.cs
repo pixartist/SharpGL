@@ -9,10 +9,16 @@ using OpenTK.Graphics.OpenGL;
 using SharpGL.Drawing;
 namespace SharpGL.Components
 {
+    /// <summary>
+    /// A MeshRenderer is a component handling a Mesh as well as a Material. It registers the Mesh in the rendering system which handles drawing
+    /// </summary>
 	public class MeshRenderer : Component
 	{
 		private Mesh _mesh;
 		private Material _material;
+        /// <summary>
+        /// The Mesh used by this renderer
+        /// </summary>
 		public Mesh Mesh
 		{
 			get
@@ -26,6 +32,9 @@ namespace SharpGL.Components
 				App.SceneRenderer.AddRenderer(this);
 			}
 		}
+        /// <summary>
+        /// The Material used to render the Mesh
+        /// </summary>
 		public Material Material
 		{
 			get
@@ -39,11 +48,19 @@ namespace SharpGL.Components
 				App.SceneRenderer.AddRenderer(this);
 			}
 		}
+        /// <summary>
+        /// The type of primitive defined by the Mesh vertices
+        /// </summary>
 		public PrimitiveType PrimitiveType { get; set; }
-		public int Components { get; private set; }
+        
+		/// <summary>
+		/// MeshRenderer-Specific Shader Parameters
+		/// </summary>
 		public ShaderParamCollection Parameters { get; private set; }
 		
-		public int Stride { get; private set; }
+		/// <summary>
+		/// Returns true if the state of the MeshRender allows rendering
+		/// </summary>
 		public bool CanRender
 		{
 			get
@@ -76,11 +93,19 @@ namespace SharpGL.Components
 			Parameters = new ShaderParamCollection();
 			App.SceneRenderer.AddRenderer(this);
 		}
+        /// <summary>
+        /// Applies the MeshRenderes custom shader parameters to the given shader
+        /// </summary>
+        /// <param name="shader">The shader to apply the parameters to</param>
 		public void ApplyParameters(Shader shader)
 		{
 			foreach (var p in Parameters.Paramters.Values)
 				p.Apply(shader);
 		}
+        /// <summary>
+        /// Sets the Mesh
+        /// </summary>
+        /// <param name="m">A Mesh Object</param>
 		public void SetMesh(Mesh m)
 		{
 			App.SceneRenderer.RemoveRenderer(this);

@@ -93,9 +93,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\BulletSharp-2.83\BulletSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Jitter">
-      <HintPath>..\packages\Jitter.0.1.7.0\lib\NET40\Jitter.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
@@ -146,6 +143,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shaders\gol.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\lit.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\unlit.glsl">

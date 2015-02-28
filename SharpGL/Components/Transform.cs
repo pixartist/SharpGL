@@ -7,7 +7,6 @@ using OpenTK;
 using SharpGL.Components;
 namespace SharpGL.Components
 {
-	
 	public static class Extensions
 	{
 		public static float PI = (float)Math.PI;
@@ -156,9 +155,14 @@ namespace SharpGL.Components
 			return c;
 		}
 	}
-
+    /// <summary>
+    /// A Transform holds and manages the transformation data for every GameObject
+    /// </summary>
 	public class Transform : Component
 	{
+        /// <summary>
+        /// Returns the parent of the owning GameObject
+        /// </summary>
 		public Transform Parent
 		{
 			get
@@ -170,8 +174,17 @@ namespace SharpGL.Components
 				return null;
 			}
 		}
+        /// <summary>
+        /// PI as floating point
+        /// </summary>
 		public static float PI = (float)Math.PI;
+        /// <summary>
+        /// The local position of the Transform
+        /// </summary>
 		public virtual Vector3 LocalPosition { get; set; }
+        /// <summary>
+        /// The global position of the Transform
+        /// </summary>
 		public virtual Vector3 Position
 		{
 			get
@@ -196,7 +209,13 @@ namespace SharpGL.Components
 				}
 			}
 		}
+        /// <summary>
+        /// The local scale of the Transform
+        /// </summary>
 		public virtual Vector3 LocalScale { get; set; }
+        /// <summary>
+        /// The global scale of the Transform
+        /// </summary>
 		public virtual Vector3 Scale
 		{
 			get
@@ -209,7 +228,11 @@ namespace SharpGL.Components
 				return LocalScale;
 			}
 		}
+
 		private Quaternion _rotation;
+        /// <summary>
+        /// The global rotation of the Transform
+        /// </summary>
 		public virtual Quaternion Rotation
 		{
 			get
@@ -234,6 +257,9 @@ namespace SharpGL.Components
 				}
 			}
 		}
+        /// <summary>
+        /// The local rotation of the Transform
+        /// </summary>
 		public virtual Quaternion LocalRotation
 		{
 			get
@@ -246,6 +272,9 @@ namespace SharpGL.Components
 				_rotation.Normalize();
 			}
 		}
+        /// <summary>
+        /// The Vector3 pointing to the local right
+        /// </summary>
 		public virtual Vector3 LocalRight
 		{
 			get
@@ -254,6 +283,9 @@ namespace SharpGL.Components
 				return Vector3.Transform(Vector3.UnitX, LocalRotation);
 			}
 		}
+        /// <summary>
+        /// The Vector3 pointing to the local forward
+        /// </summary>
 		public virtual Vector3 LocalForward
 		{
 			get
@@ -261,6 +293,9 @@ namespace SharpGL.Components
 				return Vector3.Transform(-Vector3.UnitZ, LocalRotation);
 			}
 		}
+        /// <summary>
+        /// The Vector3 pointing to the local up
+        /// </summary>
 		public virtual Vector3 LocalUp
 		{
 			get
@@ -268,6 +303,9 @@ namespace SharpGL.Components
 				return Vector3.Transform(Vector3.UnitY, LocalRotation);
 			}
 		}
+        /// <summary>
+        /// The euler angle representation of the local rotation
+        /// </summary>
 		public virtual Vector3 EulerAngles
 		{
 			get
@@ -281,11 +319,20 @@ namespace SharpGL.Components
 			LocalRotation = Quaternion.Identity;
 			LocalScale = Vector3.One;
 		}
+        /// <summary>
+        /// Tries to get the parent GameObject
+        /// </summary>
+        /// <param name="parent">The owning GameObject</param>
+        /// <returns>True if the component has a parent, false otherwise</returns>
 		public bool TryGetParent(out Transform parent)
 		{
 			parent = Parent;
 			return parent != null;
 		}
+        /// <summary>
+        /// Returns a Matrix representing the translation, rotation and scale of the Transform
+        /// </summary>
+        /// <returns>A Matrix representing the translation, rotation and scale of the Transform</returns>
 		public virtual Matrix4 GetMatrix()
 		{
 			Matrix4 translation = Matrix4.CreateTranslation(Position);
@@ -293,6 +340,10 @@ namespace SharpGL.Components
 			Matrix4 scale = Matrix4.CreateScale(Scale);
 			return scale * rotation * translation;
 		}
+        /// <summary>
+        /// Returns a Matrix representing the translation, rotation and scale of the Transform in a form fitting for GLSL
+        /// </summary>
+        /// <returns>A Matrix representing the translation, rotation and scale of the Transform in a form fitting for GLSL</returns>
         public virtual Matrix4 GetMatrixInverse()
         {
             Matrix4 translation = Matrix4.CreateTranslation(Position);
@@ -300,14 +351,27 @@ namespace SharpGL.Components
             Matrix4 scale = Matrix4.CreateScale(Scale);
             return translation * rotation;
         }
+        /// <summary>
+        /// Translates the Transform by the given Value
+        /// </summary>
+        /// <param name="amount">The amount to translate by</param>
 		public virtual void Translate(Vector3 amount)
 		{
-			LocalPosition += amount;
+			Position += amount;
 		}
+        /// <summary>
+        /// Translates the Transform by the given Value in local coordinates
+        /// </summary>
+        /// <param name="amount">The amount to translate by</param>
 		public virtual void TranslateLocal(Vector3 amount)
 		{
 			LocalPosition += Vector3.Transform(amount, LocalRotation);
 		}
+        /// <summary>
+        /// Rotates the Transform by the given angle around the given axis
+        /// </summary>
+        /// <param name="axis">The axis to rotate around</param>
+        /// <param name="angle">The amount of rotation</param>
 		public virtual void Rotate(Vector3 axis, float angle)
 		{
 			LocalRotation = Quaternion.FromAxisAngle(axis, angle) * LocalRotation;

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using SharpGL.Drawing;
 namespace SharpGL.Drawing
 {
+    /// <summary>
+    /// ShaderParamBase is the base class for shader parameters. It holds a shader variable name, type and value(s)
+    /// </summary>
     public abstract class ShaderParamBase
     {
         public string Name { get; protected set; }

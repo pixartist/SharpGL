@@ -31,7 +31,7 @@ namespace SharpGL.Drawing
 		}
 		protected override void Create(int width, int height, SurfaceFormat format)
 		{
-			this.format = format;
+			this.Format = format;
 			bool multisample = format.Multisampling > 0;
 			
 			int samples = Math.Max(0, Math.Min(format.Multisampling, 4));
@@ -152,14 +152,14 @@ namespace SharpGL.Drawing
 		}
         public void BindFramebuffer(FramebufferTarget target = FramebufferTarget.Framebuffer)
         {
-			if (format.Multisampling > 1)
+			if (Format.Multisampling > 1)
 				GL.Enable(EnableCap.Multisample);
             GL.BindFramebuffer(target, fboHandle);
         }
         public void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f)
         {
             BindFramebuffer();
-            GL.ClearColor(r,g,b,a);
+            GL.ClearColor(r, g, b, a);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }

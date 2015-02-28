@@ -9,8 +9,14 @@ using System.Windows.Forms;
 using System.Drawing;
 namespace SharpGL.Input
 {
+    /// <summary>
+    /// Handles mouse movement as well as mouse button events.
+    /// </summary>
 	public class MouseHandler
 	{
+        /// <summary>
+        /// Shows or hides the mouse cursor
+        /// </summary>
         public static bool CursorVisible
         { 
             get
@@ -22,11 +28,17 @@ namespace SharpGL.Input
                 _window.CursorVisible = value;
             }
         }
+        /// <summary>
+        /// If true, the mouse will be locked to the center of the screen.
+        /// </summary>
         public static bool MouseLocked { get; set; }
 		private static Dictionary<MouseButton, bool> pressedButtons;
 		private static Dictionary<MouseButton, Action> buttonActions;
 		private static Vector2 mPos, mDelta;
         private static GameWindow _window;
+        /// <summary>
+        /// X-Position of the mouse cursor
+        /// </summary>
 		public static float X
 		{
 			get
@@ -34,6 +46,9 @@ namespace SharpGL.Input
 				return mPos.X;
 			}
 		}
+        /// <summary>
+        /// Y-Position of the mouse cursor
+        /// </summary>
 		public static float Y
 		{
 			get
@@ -42,6 +57,9 @@ namespace SharpGL.Input
 			}
 		}
 		public delegate void MouseMoveHandler(Vector2 position, Vector2 delta);
+        /// <summary>
+        /// Called when the mouse cursor is moved.
+        /// </summary>
 		public static event MouseMoveHandler OnMouseMove;
 		internal static void Init(GameWindow window)
 		{
@@ -69,10 +87,15 @@ namespace SharpGL.Input
                 pressedButtons[e.Button] = true;
             }
 		}
-		public static void RegisterButtonDown(MouseButton k, Action action)
+        /// <summary>
+        /// Registers an action to be called when the specified mouse button is pressed
+        /// </summary>
+        /// <param name="b">Mouse button</param>
+        /// <param name="action">Event to be called</param>
+		public static void RegisterButtonDown(MouseButton b, Action action)
 		{
-			pressedButtons.Add(k, false);
-			buttonActions.Add(k, action);
+			pressedButtons.Add(b, false);
+			buttonActions.Add(b, action);
 		}
 		internal static void Update()
 		{

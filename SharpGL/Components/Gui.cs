@@ -33,7 +33,10 @@ namespace SharpGL.Drawing
 					drawBuffer.Dispose();
 				Vector2 s = cam.NearplaneSize;
 				Mesh = GameObject.App.PrimitiveFactory.Plane;//.CreatePlane(s.X / -2, s.Y / -2, -(cam.ZNear + 0.001f), s.X, s.Y, 1, 1, Quaternion.FromAxisAngle(Vector3.UnitX, Mathf.Deg2Rad(90)));
-				drawBuffer = new Surface(width, height, new SurfaceFormat { DepthBuffer = false, MipMapping = true });
+                SurfaceFormat format = SurfaceFormat.Surface2DAlpha;
+                format.DepthBuffer = false;
+                format.MipMapping = true;
+                drawBuffer = new Surface(width, height, format);
 				Material = new Drawing.Material(App.Shaders["unlit"], RenderMode.Translucent);
 
 				Material.AddTexture("_tex", drawBuffer);

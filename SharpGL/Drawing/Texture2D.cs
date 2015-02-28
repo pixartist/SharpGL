@@ -9,17 +9,17 @@ using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
 	
-	public class SurfaceFormat
+	public struct SurfaceFormat
 	{
-		public PixelInternalFormat InternalFormat = PixelInternalFormat.Rgba8;
-		public TextureWrapMode WrapMode = TextureWrapMode.Repeat;
-		public PixelFormat PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
-		public PixelType SourceType = PixelType.UnsignedByte;
-		public TextureTarget TextureTarget = TextureTarget.Texture2D;
-		public IntPtr Pixels = IntPtr.Zero;
-		public bool DepthBuffer = true;
-		public bool MipMapping = false;
-		public int Multisampling = 0;
+		public PixelInternalFormat InternalFormat ;
+		public TextureWrapMode WrapMode ;
+		public PixelFormat PixelFormat ;
+		public PixelType SourceType ;
+		public TextureTarget TextureTarget;
+		public IntPtr Pixels ;
+		public bool DepthBuffer;
+		public bool MipMapping ;
+		public int Multisampling ;
 		public SurfaceFormat(
 			PixelInternalFormat internalFormat = PixelInternalFormat.Rgba8,
 			TextureWrapMode wrapMode = TextureWrapMode.Repeat,
@@ -40,8 +40,10 @@ namespace SharpGL.Drawing
 			this.DepthBuffer = depthBuffer;
 			this.TextureTarget = TextureTarget;
 			this.MipMapping = Mimapping;
-			if (pixels.HasValue)
-				this.Pixels = pixels.Value;
+            if (pixels.HasValue)
+                this.Pixels = pixels.Value;
+            else
+                this.Pixels = IntPtr.Zero;
 		}
 		public static SurfaceFormat Texture2D
 		{
@@ -78,7 +80,7 @@ namespace SharpGL.Drawing
 		
 		protected bool disposed = false;
         protected int textureHandle = 0;
-		protected SurfaceFormat format;
+        public SurfaceFormat Format { get; protected set; }
         public int Width { get; protected set; }
         public int Height { get; protected set; }
         public int ID
@@ -105,7 +107,7 @@ namespace SharpGL.Drawing
 		}
 		protected virtual void Create(int width, int height, SurfaceFormat format)
 		{
-			this.format = format;
+			this.Format = format;
 			Width = width;
 			Height = height;
 			textureHandle = GL.GenTexture();
@@ -175,7 +177,18 @@ namespace SharpGL.Drawing
         public void BindTexture(TextureUnit slot = TextureUnit.Texture0)
         {
             GL.ActiveTexture(slot);
-            GL.BindTexture(format.TextureTarget, textureHandle);
+            GL.BindTexture(Format.TextureTarget, textureHandle);
+            
+        }
+        public static void SetPixels<T>(TextureTarget target, PixelFormat format, PixelType type, int x, int y, int w, int h, T pixels) where T : struct
+        {
+            GL.TexSubImage2D(target, 0, x, y, w, h, format, type, ref pixels);
+        }
+        public void SetPixels<T>(int x, int y, int w, int h, PixelType pixelType, T pixels) where T : struct
+        {
+            BindTexture();
+            Texture2D.SetPixels(TextureTarget.Texture2D, Format.PixelFormat, pixelType, x, y, w, h, pixels);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
             
         }
         public void Dispose()

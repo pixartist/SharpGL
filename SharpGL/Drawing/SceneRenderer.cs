@@ -16,6 +16,9 @@ namespace SharpGL.Drawing
 		private int VAO;
 		private App App;
 		public bool UseAlphaToCoverage { get; set; }
+        public Vector3 AmbientLight { get; set; }
+        public Vector3 SkylightColor { get; set; }
+        public Vector3 SkylightDirection { get; set; }
 		public SceneRenderer(App app)
 		{
 			this.App = app;
@@ -95,11 +98,15 @@ namespace SharpGL.Drawing
 							mat.Key.Use();
 							mat.Key.Shader.SetUniform<float>("_time", time);
 							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+                            mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X, AmbientLight.Y, AmbientLight.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_rotationMatrix", c.Transform.Rotation.ToMatrix4());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
@@ -164,11 +171,15 @@ namespace SharpGL.Drawing
 							mat.Key.Use();
 							mat.Key.Shader.SetUniform<float>("_time", time);
 							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+                            mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X , AmbientLight.Y , AmbientLight.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
@@ -184,7 +195,7 @@ namespace SharpGL.Drawing
 				GL.BindVertexArray(0);
 				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			}
-			//Draw transparent meshes without color (if multisampling disabled)
+			//Draw transparent meshes without color (if multisampling disabled) for depth masking
 			if (transpCalls != null)
 			{
 				GL.ColorMask(false, false, false, false);
@@ -209,6 +220,7 @@ namespace SharpGL.Drawing
 								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
@@ -224,7 +236,7 @@ namespace SharpGL.Drawing
 					GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 				}
 				GL.ColorMask(true, true, true, true);
-				//Draw again but with color
+				//Draw again but with color and Lequal depth func
 				GL.DepthFunc(DepthFunction.Lequal);
 				GL.DepthMask(false);
 				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha); 
@@ -243,12 +255,16 @@ namespace SharpGL.Drawing
 							mat.Key.Use();
 							mat.Key.Shader.SetUniform<float>("_time", time);
 							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
+                            mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X, AmbientLight.Y, AmbientLight.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
+                            mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
 								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);

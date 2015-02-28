@@ -10,6 +10,9 @@ using SharpGL.Components;
 using SharpGL.Drawing;
 namespace SharpGL.Factories
 {
+    /// <summary>
+    /// Creates primitive meshes
+    /// </summary>
 	public class PrimitiveFactory
 	{
 		/// <summary>
@@ -34,6 +37,7 @@ namespace SharpGL.Factories
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
+                
 				        0,         0,         0, -1, -1, -1, 0, 0, //0
 				 + size.X,         0,         0,  1, -1, -1, 1, 0, //1
 				        0,  + size.Y,         0, -1,  1, -1, 0, 1, //2
