@@ -27,6 +27,7 @@ namespace ModernShaders
 		private Canvas canvas;
 		private PlayerControllerFPS playerController;
         private Random rnd;
+        private Surface sun;
 		public ShaderGame(int width, int height) : base(width, height)
 		{
 			
@@ -42,7 +43,7 @@ namespace ModernShaders
 			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => {  /*playerController.Translate(-Vector3.UnitY);*/ });
             KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Jump(); /*playerController.Translate(Vector3.UnitY);*/ });
 			KeyboardHandler.RegisterKeyDown(Key.Escape, () => { Window.Close();});
-            //MouseHandler.MouseLocked = true;
+            MouseHandler.MouseLocked = true;
             MouseHandler.CursorVisible = false;
 			//KeyboardHandler.RegisterKeyDown(Key.Q, () => { ActiveCamera.Transform.LocalRotation = ActiveCamera.Transform.LocalPosition.LookAt(Vector3.Zero, Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.E, () =>
@@ -62,7 +63,7 @@ namespace ModernShaders
 
 			Log.ShowDebug = true;
 			Log.Debug("Creating gui");
-            SceneRenderer.AmbientLight = new Vector3(0.2f, 1, 1);
+            SceneRenderer.AmbientLight = new Vector3(0.05f, 0.05f, 0.05f);
             SceneRenderer.SkylightColor = new Vector3(1, 1, 1);
             SceneRenderer.SkylightDirection = new Vector3(1, 0, 0);
 			//Setup font
@@ -73,7 +74,7 @@ namespace ModernShaders
             playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
 			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
-			sf.Multisampling = 2;
+			sf.Multisampling = 1;
 			multisampler = new Surface(Window.Width, Window.Height, sf);
 
 			postEffect = new Material(Shaders["screenCA"], RenderMode.Opaque);
@@ -85,18 +86,23 @@ namespace ModernShaders
 			postEffect.Parameters.SetParameter<float>("chromatic", 0.1f);
 
 			//Create base plate
-            var prb = GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero).AddComponent<Rigidbody>();
+            var basePlate = GameObjectFactory.CreatePlane(new Vector3(15, 15, 15), Vector3.Zero);
+            basePlate.Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
+            var prb = basePlate.AddComponent<Rigidbody>();
             prb.SetCollisionBox(new Vector3(7.5f, -0.25f, 7.5f), new Vector3(15, 1f, 15));
             prb.MakeStatic();
 			//Create sun image plane
-			Surface sun = new Surface("sun.png");
-			(GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 1, 0)).Component<MeshRenderer>().Material = new Material(Shaders["unlit"], RenderMode.Translucent)).AddTexture("_tex", sun);
+			sun = new Surface("sun.png");
+            Material sunMat = new Material(Shaders["lit"], RenderMode.Translucent);
+            sunMat.AddTexture("_tex", sun);
+            sunMat.Parameters.SetParameter<float>("_color", 1f, 1f, 0f, 1f);
+            GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 2, 0)).Component<MeshRenderer>().Material = sunMat ;
 			//red cube
-			var cu = GameObjectFactory.CreateCube(new Vector3(0,8.5f,0), Vector3.One*2f);
+			var cu = GameObjectFactory.CreateCube(new Vector3(0,3.5f,0), Vector3.One*2f);
 			cu.Component<MeshRenderer>().Parameters.SetParameter<float>("_color", 1, 0, 0, 1);
-            prb = cu.AddComponent<Rigidbody>();
-            prb.SetCollisionConvexMesh(cu.Component<MeshRenderer>().Mesh, Vector3.One * 0.5f, cu.Transform.Scale);
-            prb.SetMass(8.0f);
+            //prb = cu.AddComponent<Rigidbody>();
+            //prb.SetCollisionConvexMesh(cu.Component<MeshRenderer>().Mesh, Vector3.One * 0.5f, cu.Transform.Scale);
+            //prb.SetMass(8.0f);
 			//prb.Body.IsStatic = true;
 			//Create gui
 			var guiObj = CreateGameObject("GUI");
@@ -111,29 +117,17 @@ namespace ModernShaders
 			
 			
 			//setup rotating cubes
-			rotator = GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One);
+			rotator = GameObjectFactory.CreateCube(new Vector3(-4, 0, 2), Vector3.One);
             GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One).Parent = rotator;
 			
 			//Create plane for camera image displaying
 			canvas = new Canvas(1024,1024, false);
 			canvas.Clear(0, 0, 0, 0.5f);
 			canvas.DrawText(",.-+ A B C ABC def 123" , Shaders["text"], defaultFont, 0.5f, new Vector2(300, 300),new Vector4(1,0,0,1));
-			planeRenderer = GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 2, 3)).Component<MeshRenderer>();
+            var plane = GameObjectFactory.CreatePlane(Vector3.One * 4, new Vector3(3, 4, -2));
+            plane.Transform.Rotate(Vector3.UnitX, 1f);
+			planeRenderer = plane.Component<MeshRenderer>();
 			(planeRenderer.Material = new Material(Shaders["unlit"], RenderMode.Opaque)).AddTexture("_tex", canvas.Surface);
-
-			//Gol shader
-			var golObject = GameObjectFactory.CreatePlane(Vector3.One * 5, new Vector3(8, 3, 8));
-			var goldR = golObject.Component<MeshRenderer>().Material = new Material(Shaders["gol"], RenderMode.Opaque);
-			var surf = SurfaceFormat.Surface2D;
-			surf.DepthBuffer = false;
-			surf.MipMapping = true;
-			golObject.Component<MeshRenderer>().Material.AddTexture("_tex", new Surface(1024, 1024, surf));
-			Log.Write(GL.GetError().ToString());
-
-			//physics 
-			//var vcube = GameObjectFactory.CreateCube(new Vector3(-0.3f, 2, -0.3f), Vector3.One * 2);
-			//prb = vcube.AddComponent<BulletRigidbody>();
-           // prb.SetCollisionConvexMesh(vcube.Component<MeshRenderer>().Mesh, new Vector3(1f, 1f, 1f), vcube.Transform.Scale);
 			
 		}
 
@@ -162,7 +156,9 @@ namespace ModernShaders
 			gui.DrawText("FPS:  " + Fps, defaultFont, 0.6f, new Vector2(p.X, p.Y + 100), new Vector4(1, 0.5f, 0.5f, 1));
 			
 			//Render multisampler
+
 			SceneRenderer.RenderMultisampled(ActiveCamera, multisampler, time);
+           
 			multisampler.CloneTo(postEffect.Textures["_tex"]);
 
 			canvas.Clear();
@@ -170,13 +166,9 @@ namespace ModernShaders
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			GL.Viewport(0, 0, Window.Width, Window.Height);
 			postEffect.Use();
-            //multisampler.BindTexture();
-            //canvas.Surface.BindTexture();
 			Helper.DrawScreenQuad();
 			GL.UseProgram(0);
-			 
-			//SceneRenderer.Render(ActiveCamera, time);
-			//canvas.DrawSurface(postEffect.Textures["_tex"], 0, 0, canvas.Width, canvas.Height);
+
 		}
 	}
 }

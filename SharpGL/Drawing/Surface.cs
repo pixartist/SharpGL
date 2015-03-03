@@ -23,7 +23,7 @@ namespace SharpGL.Drawing
 		}
 		public Surface(string filePath)
 		{
-			CreateFromPNG(filePath, new SurfaceFormat());
+			CreateFromPNG(filePath);
 		}
 		public Surface(string filePath, SurfaceFormat format)
 		{
@@ -89,7 +89,7 @@ namespace SharpGL.Drawing
 		}
 		protected override void CreateFromPNG(string filePath)
 		{
-			CreateFromPNG(filePath, new SurfaceFormat());
+			CreateFromPNG(filePath, SurfaceFormat.Texture2DAlpha);
 		}
 		protected void CreateFromPNG(string filePath, SurfaceFormat format)
         {

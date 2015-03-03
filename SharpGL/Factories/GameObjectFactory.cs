@@ -41,7 +41,7 @@ namespace SharpGL.Factories
 			r.Mesh = App.PrimitiveFactory.Cube;
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Material = App.Materials["lit"];
-			r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
+			//r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
         /// <summary>
@@ -59,7 +59,7 @@ namespace SharpGL.Factories
 			r.Mesh = App.PrimitiveFactory.Cube;
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Material = App.Materials["lit"];
-			r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
+			//r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
         /// <summary>
@@ -77,7 +77,7 @@ namespace SharpGL.Factories
 			r.Mesh = App.PrimitiveFactory.Plane;
 			r.PrimitiveType = PrimitiveType.Triangles;
 			r.Material = App.Materials["lit"];
-			r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
+			//r.Parameters.SetParameter<float>("_color", 1, 1, 1, 1);
 			return result;
 		}
 	}

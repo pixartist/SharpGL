@@ -99,6 +99,11 @@ namespace SharpGL.Components
         /// <param name="shader">The shader to apply the parameters to</param>
 		public void ApplyParameters(Shader shader)
 		{
+            if (Material != null)
+            {
+                foreach (var p in Material.Parameters.Paramters.Values)
+                    p.Apply(shader);
+            }
 			foreach (var p in Parameters.Paramters.Values)
 				p.Apply(shader);
 		}

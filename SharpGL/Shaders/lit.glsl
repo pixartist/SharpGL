@@ -47,11 +47,11 @@ void main()
 	{
 		c = _color;
 	}
-	vec3 light = _ambient + _skylightColor * (
+	vec3 light = _ambient + _skylightColor * ((
 		dot(
 			normalize(_skylightDirection), normalize(vNormal)
 		) + 1.0 
-	) * 0.5;
+	) * 0.5);
 	outColor = vec4(c.rgb * clamp(light, 0.0, 1.0), c.a); 
 }
 

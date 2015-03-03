@@ -101,6 +101,7 @@ namespace SharpGL.Drawing
                             mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X, AmbientLight.Y, AmbientLight.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
+                            
 							mesh.Key.ApplyDrawHints(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
@@ -178,8 +179,8 @@ namespace SharpGL.Drawing
 							foreach (var c in mat.Value)
 							{
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
-								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
-                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_rotationMatrix", c.Transform.Rotation.ToMatrix4());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
@@ -219,8 +220,8 @@ namespace SharpGL.Drawing
 							{
 								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
-								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
-                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_rotationMatrix", c.Transform.Rotation.ToMatrix4());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);
@@ -263,8 +264,8 @@ namespace SharpGL.Drawing
 							{
 								c.OnPreDraw();
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
-								mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
-                                mat.Key.Shader.SetUniform<Matrix4>("_modelMatrix", c.Transform.GetMatrixInverse());
+                                mat.Key.Shader.SetUniform<Matrix4>("_modelViewProjection", camera.GetModelViewProjectionMatrix(c.Transform));
+                                mat.Key.Shader.SetUniform<Matrix4>("_rotationMatrix", c.Transform.Rotation.ToMatrix4());
 								c.ApplyParameters(mat.Key.Shader);
 								if (mesh.Key.VEO > 0)
 									GL.DrawElements(c.PrimitiveType, elementCount, DrawElementsType.UnsignedInt, 0);

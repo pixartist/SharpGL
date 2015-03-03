@@ -37,15 +37,48 @@ namespace SharpGL.Factories
 		{
 			Mesh mesh = new Mesh();
 			float[] vertices = new float[] {
-                
-				        0,         0,         0, -1, -1, -1, 0, 0, //0
-				 + size.X,         0,         0,  1, -1, -1, 1, 0, //1
-				        0,  + size.Y,         0, -1,  1, -1, 0, 1, //2
-				 + size.X,  + size.Y,         0,  1,  1, -1, 1, 1, //3
-				        0,         0,  + size.Z, -1, -1,  1, 0, 1, //4
-				 + size.X,         0,  + size.Z,  1, -1,  1, 1, 1, //5
-				        0,  + size.Y,  + size.Z, -1,  1,  1, 0, 0, //6
-				 + size.X,  + size.Y,  + size.Z,  1,  1,  1, 1, 0,//7
+                //front
+				 0,         0,         0,        0,  0, -1, 0, 0, 
+                 0,         + size.Y,  0,        0,  0, -1, 0, 1,
+				 + size.X,  0,         0,        0,  0, -1, 1, 0, 
+                 + size.X,  0,         0,        0,  0, -1, 1, 0, 
+                 0,         + size.Y,  0,        0,  0, -1, 0, 1,
+				 + size.X,  + size.Y,  0,        0,  0, -1, 1, 1, 
+                 //back
+				 + size.X,  0,         + size.Z, 0,  0,  1, 0, 0, 
+                 + size.X,  + size.Y,  + size.Z, 0,  0,  1, 0, 1,
+				 0,         0,         + size.Z, 0,  0,  1, 1, 0, 
+                 0,         0,         + size.Z, 0,  0,  1, 1, 0, 
+                 + size.X,  + size.Y,  + size.Z, 0,  0,  1, 0, 1,
+				 0,         + size.Y,  + size.Z, 0,  0,  1, 1, 1, 
+                 //top
+                 0,         + size.Y,  0,        0,  1,  0, 0, 0, 
+                 0,         + size.Y,  + size.Z, 0,  1,  0, 0, 1,
+				 + size.X,  + size.Y,  0,        0,  1,  0, 1, 0, 
+                 + size.X,  + size.Y,  0,        0,  1,  0, 1, 0, 
+                 0,         + size.Y,  + size.Z, 0,  1,  0, 0, 1,
+				 + size.X,  + size.Y,  + size.Z, 0,  1,  0, 1, 1, 
+                 //bottom
+                 0,         0,         + size.Z, 0, -1,  0, 0, 0, 
+                 0,         0,         0,        0, -1,  0, 0, 1,
+				 + size.X,  0,         + size.Z, 0, -1,  0, 1, 0, 
+                 + size.X,  0,         + size.Z, 0, -1,  0, 1, 0, 
+                 0,         0,         0,        0, -1,  0, 0, 1,
+				 + size.X,  0,         0,        0, -1,  0, 1, 1, 
+                 //left
+                 0,         0,         + size.Z, -1, 0,  0, 0, 0, 
+                 0,         + size.Y,  + size.Z, -1, 0,  0, 0, 1,
+				 0,         0,         0,        -1, 0,  0, 1, 0, 
+                 0,         0,         0,        -1, 0,  0, 1, 0, 
+                 0,         + size.Y,  + size.Z, -1, 0,  0, 0, 1,
+				 0,         + size.Y,  0,        -1, 0,  0, 1, 1, 
+                 //right
+                 + size.X,  0,         0,         1, 0,  0, 0, 0, 
+                 + size.X,  + size.Y,  0,         1, 0,  0, 0, 1,
+				 + size.X,  0,         + size.Z,  1, 0,  0, 1, 0, 
+                 + size.X,  0,         + size.Z,  1, 0,  0, 1, 0, 
+                 + size.X,  + size.Y,  0,         1, 0,  0, 0, 1,
+				 + size.X,  + size.Y,  + size.Z,  1, 0,  0, 1, 1
 			};
 			/*size *= 0.5f;
 			Mesh mesh = new Mesh();
@@ -68,7 +101,7 @@ namespace SharpGL.Factories
 				0,4,2,2,4,6, //left
 				5,1,7,7,1,3 //right
 			};
-			mesh.SetIndices(indices);
+			//mesh.SetIndices(indices);
 			//mesh.SetDrawHints(new VertexObjectDrawHint("pos", 3, 6, 0, false));
 			mesh.SetDrawHints(new VertexObjectDrawHint("_pos", 3, 8, 0, false), new VertexObjectDrawHint("_normal", 3, 8, 3, true), new VertexObjectDrawHint("_texCoord", 2, 8, 6, false));
 			return mesh;

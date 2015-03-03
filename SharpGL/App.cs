@@ -169,7 +169,7 @@ namespace SharpGL
 			long newTime = time.ElapsedMilliseconds;
 			long delta = (newTime - lastTime);
 			if(delta > 0)
-				Fps = Fps * 0.9f + (1000f / delta)*0.1f;
+				Fps = Fps * 0.95f + (1000f / delta)*0.05f;
 			lastTime = newTime;
             var window = (GameWindow)sender;
 			GL.Viewport(0, 0, window.Width, window.Height);
@@ -177,7 +177,8 @@ namespace SharpGL
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			OnDraw(Time);
             window.SwapBuffers();
-			
+            if (PhysicsWorld != null)
+                PhysicsWorld.StepSimulation(DT);
         }
 		
 		
@@ -190,8 +191,7 @@ namespace SharpGL
             KeyboardHandler.Update();
 			OnUpdate();
             SceneRoot.Update(DT);
-			if (PhysicsWorld != null)
-				PhysicsWorld.StepSimulation(DT);
+			
 				//PhysicsWorld.Step(DT, true);
 			
             
