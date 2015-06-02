@@ -25,6 +25,7 @@ namespace SharpGL.Components.BulletPhysics
             CharacterGhost.WorldTransform = Transform.GetMatrixInverse();
             CharacterGhost.CollisionShape = shape;
             CharacterGhost.CollisionFlags = CollisionFlags.CharacterObject;
+            CharacterGhost.UserObject = GameObject;
             Controller = new KinematicCharacterController(CharacterGhost, shape, 0.1f);
             SetMaxJumpHeight(1.0f);
             SetJumpSpeed(15.0f);

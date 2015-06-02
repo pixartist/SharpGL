@@ -14,7 +14,7 @@ namespace SharpGL.Drawing
     /// <summary>
     /// A draw hint contains information about how to handle given Vertex data in the Shader
     /// </summary>
-	public struct VertexObjectDrawHint
+	public struct AttributeHint
 	{
 		public string attributeName;
 		public int components;
@@ -22,7 +22,7 @@ namespace SharpGL.Drawing
 		public int offset;
 		public bool normalize;
 
-		public VertexObjectDrawHint(string attributeName, int components, int stride, int offset, bool normalize)
+		public AttributeHint(string attributeName, int components, int stride, int offset, bool normalize)
 		{
 			this.attributeName = attributeName;
 			this.components = components;
@@ -31,6 +31,7 @@ namespace SharpGL.Drawing
 			this.normalize = normalize;
 		}
 	}
+   
     /// <summary>
     /// A Shader creates and binds OpenGL shaders and provides Methods to apply shader parameters
     /// </summary>
@@ -40,13 +41,29 @@ namespace SharpGL.Drawing
         const string IdentRegex = "\\[Shader\\s+([a-zA-Z\\d]*)\\]";
         private bool disposed = false;
         private string vertexIdent, geometryIdent, fragmentIdent;
+        /// <summary>
+        /// Vertex shader location
+        /// </summary>
 		public int LocVertex { get; private set; }
+        /// <summary>
+        /// Geometry shader location
+        /// </summary>
 		public int LocGeometry { get; private set; }
+        /// <summary>
+        /// Fragment shader location
+        /// </summary>
 		public int LocFragment { get; private set; }
 		public int Program { get; private set; }
         private Dictionary<string, int> uniformLocations;
 		private Dictionary<string, int> vertexAttributeLocations;
 		private string filePath;
+        /// <summary>
+        /// Creates a shader
+        /// </summary>
+        /// <param name="filePath">The text-file containing the shader data</param>
+        /// <param name="vertexIdent">The identifier of the vertex shader</param>
+        /// <param name="geometryIdent">The identifier of the geometry shader</param>
+        /// <param name="fragmentIdent">The identifier of the fragment shader</param>
 		public Shader(string filePath, string vertexIdent, string geometryIdent, string fragmentIdent)
         {
 			this.filePath = filePath;
@@ -97,7 +114,7 @@ namespace SharpGL.Drawing
         /// Applies vertex attributes
         /// </summary>
         /// <param name="drawHints">One or multiple vertex draw hints containing information about how to handle vertex data</param>
-		public void SetVertexAttributes(params VertexObjectDrawHint[] drawHints)
+		public void SetVertexAttributes(params AttributeHint[] drawHints)
 		{
 			foreach (var h in drawHints)
 			{
@@ -114,23 +131,50 @@ namespace SharpGL.Drawing
 				}
 			}
 		}
+        /// <summary>
+        /// Sets a uint uniform value at the given location
+        /// </summary>
+        /// <param name="location">The location of the uniform value in the current shader program</param>
+        /// <param name="value">The value to pass to the shader program</param>
 		public void SetUniform(int location, uint value) 
 		{
 			GL.Uniform1(location, value);
 		}
+        /// <summary>
+        /// Sets a float uniform value at the given location
+        /// </summary>
+        /// <param name="location">The location of the uniform value in the current shader program</param>
+        /// <param name="value">The value to pass to the shader program</param>
 		public void SetUniform(int location, float value)
 		{
 			GL.Uniform1(location, value);
 		}
+        /// <summary>
+        /// Sets a double uniform value at the given location
+        /// </summary>
+        /// <param name="location">The location of the uniform value in the current shader program</param>
+        /// <param name="value">The value to pass to the shader program</param>
 		public void SetUniform(int location, double value)
 		{
 			GL.Uniform1(location, value);
 		}
+        /// <summary>
+        /// Sets the value of the given uniform variable.
+        /// </summary>
+        /// <typeparam name="T">The data type of the uniform variable</typeparam>
+        /// <param name="name">The name of the uniform variable in the shader program</param>
+        /// <param name="values">A list of values which will be passed to the uniform location</param>
 		public void SetUniform<T>(string name, params T[] values)
         {
             SetUniform(name, typeof(T), values);
 			
         }
+        /// <summary>
+        /// Sets the value of the given uniform variable.
+        /// </summary>
+        /// <param name="name">The name of the uniform variable in the shader program</param>
+        /// <param name="type">The data type of the uniform variable</typeparam>
+        /// <param name="values">A list of values which will be passed to the uniform location</param>
         public void SetUniform(string name, Type type, object values)
         {
             if (type == typeof(float))
@@ -187,10 +231,12 @@ namespace SharpGL.Drawing
             else
                 throw (new NotImplementedException("type " + type + " not supported"));
         }
-		private void ApplyMultiUniform<T>(int location, int length, T[] data)
-		{
-            throw (new NotImplementedException("This is not implemented"));
-		}
+		
+        /// <summary>
+        /// Returns the location of a uniform variable in the shader program
+        /// </summary>
+        /// <param name="name">The name of the uniform variable</param>
+        /// <returns>The location of the uniform variable</returns>
         public int GetUniformLoc(string name)
         {
             int loc=-1;
@@ -295,6 +341,7 @@ namespace SharpGL.Drawing
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             
         }
+
         private string GetShaderString(string data, string ident)
         {
             string actualIdent = Identifier.Replace("%s", ident);
@@ -330,13 +377,16 @@ namespace SharpGL.Drawing
             Log.Error(t.ToString() +": " + err);
             GL.AttachShader(program, s);
         }
-        
+        private void ApplyMultiUniform<T>(int location, int length, T[] data)
+        {
+            throw (new NotImplementedException("This is not implemented"));
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)

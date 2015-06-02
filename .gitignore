@@ -29,6 +29,10 @@ local.properties
 .buildpath
 
 
+BulletSharp-2.83/
+Docs/
+Models/
+
 #################
 ## Visual Studio
 #################

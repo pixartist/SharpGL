@@ -8,7 +8,9 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
-	
+	/// <summary>
+	/// Unused
+	/// </summary>
 	public class VertexObject
 	{
 		private int verticeLength;
@@ -28,7 +30,7 @@ namespace SharpGL.Drawing
 			verticeLength = vertices.Length;
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 		}
-		public void Draw(Shader shader, params VertexObjectDrawHint[] hints)
+		public void Draw(Shader shader, params AttributeHint[] hints)
 		{
 			if(verticeLength > 0)
 			{

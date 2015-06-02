@@ -65,24 +65,7 @@ namespace SharpGL.Components
 		{
 			get
 			{
-				if(App != null)
-				{
-					if (App.ActiveCamera != null)
-					{
-						if (Mesh != null)
-						{
-							if (Mesh.HasDrawHints)
-							{
-								if (Mesh.VertexArrayLength > 0)
-								{
-									return true;
-								}
-							}
-						}
-
-					}
-				}
-				return false;
+                return App != null && App.ActiveCamera != null && Mesh != null && Mesh.Attributes.Count > 0;
 			}
 		}
 		

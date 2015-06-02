@@ -19,13 +19,14 @@ namespace ModernShaders
 	class ShaderGame : App
 	{
 		private GameObject rotator;
+        private GameObject car;
 		private Gui gui;
 		private Font defaultFont;
 		private Material postEffect;
 		private Surface multisampler;
 		private MeshRenderer planeRenderer;
 		private Canvas canvas;
-		private PlayerControllerFPS playerController;
+		private PlayerControllerGhost playerController;
         private Random rnd;
         private Surface sun;
 		public ShaderGame(int width, int height) : base(width, height)
@@ -41,7 +42,7 @@ namespace ModernShaders
 			KeyboardHandler.RegisterKeyDown(Key.A, () => { playerController.MoveLeft(); });
 			KeyboardHandler.RegisterKeyDown(Key.D, () => { playerController.MoveRight(); });
 			KeyboardHandler.RegisterKeyDown(Key.ShiftLeft, () => {  /*playerController.Translate(-Vector3.UnitY);*/ });
-            KeyboardHandler.RegisterKeyDown(Key.Space, () => { playerController.Jump(); /*playerController.Translate(Vector3.UnitY);*/ });
+            KeyboardHandler.RegisterKeyDown(Key.Space, () => { /*playerController.Jump(); */playerController.Translate(Vector3.UnitY); });
 			KeyboardHandler.RegisterKeyDown(Key.Escape, () => { Window.Close();});
             MouseHandler.MouseLocked = true;
             MouseHandler.CursorVisible = false;
@@ -71,7 +72,7 @@ namespace ModernShaders
 			//Setup Camera
             
 			ActiveCamera.GameObject.Transform.Position = new Vector3(4, 3, 4);
-            playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerFPS>();
+            playerController = ActiveCamera.GameObject.AddComponent<PlayerControllerGhost>();
 			//Setup Multisampler & Screen buffer
 			var sf = SurfaceFormat.Surface2D;
 			sf.Multisampling = 1;
@@ -113,9 +114,24 @@ namespace ModernShaders
 			gui.Transform.LocalScale = new Vector3(ss.X, 1, ss.Y);
 			guiObj.Transform.Rotate(guiObj.Transform.LocalRight, Mathf.Deg2Rad(90));
             guiObj.Parent = CameraContainer;
-
-			
-			
+            //Mesh p = Mesh.LoadOBJ("E:\\Coding\\WIP\\SharpGL\\Models\\BumbleBee\\RB-BumbleBee.obj");
+           /* var robot = CreateGameObject("car");
+            robot.Transform.LocalScale = new Vector3(0.005f, 0.005f, 0.005f);
+            robot.Transform.Rotate(Vector3.UnitX,- Mathf.PI/2);
+            robot.Transform.Translate(new Vector3(-2f, 0.4f, 0));
+            var robotM = robot.AddComponent<MeshRenderer>();
+            robotM.Mesh = p;
+            robotM.Material = Materials["lit"];
+            robotM.Parameters.SetParameter<float>("_color", 0.3f, 0.3f, 0.4f, 1f);*/
+            Mesh p = Mesh.LoadOBJ("E:\\Coding\\WIP\\SharpGL\\Models\\911\\Porsche_911_GT2.obj");
+            car = CreateGameObject("car");
+            //robot.Transform.LocalScale = new Vector3(0.005f, 0.005f, 0.005f);
+           // robot.Transform.Rotate(Vector3.UnitX, -Mathf.PI / 2);
+            car.Transform.Translate(new Vector3(1f, 1f, 0));
+            var carM = car.AddComponent<MeshRenderer>();
+            carM.Mesh = p;
+            carM.Material = Materials["lit"];
+            carM.Parameters.SetParameter<float>("_color", 0.6f, 0.3f, 0.4f, 1f);
 			//setup rotating cubes
 			rotator = GameObjectFactory.CreateCube(new Vector3(-4, 0, 2), Vector3.One);
             GameObjectFactory.CreateCube(new Vector3(2, 0, 2), Vector3.One).Parent = rotator;
@@ -135,8 +151,8 @@ namespace ModernShaders
 		public override void OnUpdate()
 		{
 			//rotate my cubes
-			rotator.Transform.Rotate(Vector3.UnitX, 0.1f);
-			
+			rotator.Transform.Rotate(Vector3.UnitX, 0.03f);
+            car.Transform.Rotate(Vector3.UnitY, 0.01f);
 			
 		}
 		void MouseHandler_OnMouseMove(Vector2 position, Vector2 delta)

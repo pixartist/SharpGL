@@ -7,24 +7,53 @@ using OpenTK;
 using SharpGL.Components;
 namespace SharpGL.Components
 {
+    /// <summary>
+    /// Extention class provides some mathematical helper functions for matrices, quaternions and vectors
+    /// </summary>
 	public static class Extensions
 	{
+        /// <summary>
+        /// Constant pi
+        /// </summary>
 		public static float PI = (float)Math.PI;
+        /// <summary>
+        /// Calculates the rotation between two vectors in 3D-Space
+        /// </summary>
+        /// <param name="u">From vector</param>
+        /// <param name="v">To vector</param>
+        /// <returns>A Quaternion that represents the rotation from u to v</returns>
 		public static Quaternion RotationBetweenVectors(Vector3 u, Vector3 v)
 		{
 			float m = (float)Math.Sqrt(2.0f + 2.0f * Vector3.Dot(u, v));
 			Vector3 w = (1.0f / m) * Vector3.Cross(u, v);
 			return new Quaternion(0.5f * m, w.X, w.Y, w.Z);
 		}
-		
+		/// <summary>
+		/// Creates a Quaternion representing the given direction
+		/// </summary>
+		/// <param name="direction">The direction in which to look</param>
+		/// <param name="up">The up-axis of the resulting Quaternion</param>
+		/// <returns>A Quaternion representing the given look direction</returns>
 		public static Quaternion LookDirection(this Vector3 direction, Vector3 up)
 		{
 			return Matrix4.LookAt(direction, Vector3.Zero, Vector3.UnitY).ToQuaternion();
 		}
+        /// <summary>
+        /// Creates a Quaternion that represents a rotation that points from the from vector to the target
+        /// </summary>
+        /// <param name="from">The location from which to look</param>
+        /// <param name="target">The target to look at</param>
+        /// <param name="up">The up-axis of the resulting Quaternion</param>
+        /// <returns>A Quaternion representing the rotation of a direction vector from the source to the target with the up-vector as the up-axis</returns>
 		public static Quaternion LookAt(this Vector3 from, Vector3 target, Vector3 up)
 		{
 			return Matrix4.LookAt(from, target, Vector3.UnitY).ToQuaternion();
 		}
+        /// <summary>
+        /// Converts a Quaternion to a Matrix4
+        /// </summary>
+        /// <param name="q">The Quaternion to convert</param>
+        /// <returns>A Matrix4 containing the rotation of the given Quaternion</returns>
 		public static Matrix4 ToMatrix4(this Quaternion q)
 		{
 			Matrix4 result = Matrix4.Identity;
@@ -55,6 +84,11 @@ namespace SharpGL.Components
 			result.M33 = 1 - 2 * (xx + yy);
 			return result;
 		}
+        /// <summary>
+        /// Converts the Orientation of a Matrix4 to a Quaternion
+        /// </summary>
+        /// <param name="m">The Matrix4 from which to extract the orientation</param>
+        /// <returns>A Quaternion containing the orientation component of the given Matrix4</returns>
 		public static Quaternion ToQuaternion(this Matrix4 m)
 		{
 			Quaternion q;
@@ -107,6 +141,11 @@ namespace SharpGL.Components
 			q = new Quaternion(X, Y, Z, W);
 			return q;
 		}
+        /// <summary>
+        /// Converts a Quaternion to Euler-Angles
+        /// </summary>
+        /// <param name="q">The Quaternion to convert</param>
+        /// <returns>A set of euler-angles equivalent to the given Quaternions orientation</returns>
 		public static Vector3 ToEuler(this Quaternion q)
 		{
 			Vector3 euler = new Vector3();
@@ -135,6 +174,11 @@ namespace SharpGL.Components
 			euler.Z = (float)Math.Atan2(2 * q.X * q.W - 2 * q.Y * q.Z, -sqx + sqy - sqz + sqw);
 			return euler;
 		}
+        /// <summary>
+        /// Converts a set of euler-angles to a Quaternion
+        /// </summary>
+        /// <param name="euler">The euler-angles</param>
+        /// <returns>A Quaternion constructed from the given euler-angles</returns>
 		public static Quaternion ToQuaternion(this Vector3 euler)
 		{
 			// Assuming the angles are in radians.
@@ -156,7 +200,7 @@ namespace SharpGL.Components
 		}
 	}
     /// <summary>
-    /// A Transform holds and manages the transformation data for every GameObject
+    /// A Transform is a component that contains information about the transformation, e.g. the location, rotation and scale of an object. 
     /// </summary>
 	public class Transform : Component
 	{
@@ -303,6 +347,37 @@ namespace SharpGL.Components
 				return Vector3.Transform(Vector3.UnitY, LocalRotation);
 			}
 		}
+        /// <summary>
+        /// The Vector3 pointing right
+        /// </summary>
+        public virtual Vector3 Right
+        {
+            get
+            {
+
+                return Vector3.Transform(Vector3.UnitX, Rotation);
+            }
+        }
+        /// <summary>
+        /// The Vector3 pointing forward
+        /// </summary>
+        public virtual Vector3 Forward
+        {
+            get
+            {
+                return Vector3.Transform(-Vector3.UnitZ, Rotation);
+            }
+        }
+        /// <summary>
+        /// The Vector3 pointing up
+        /// </summary>
+        public virtual Vector3 Up
+        {
+            get
+            {
+                return Vector3.Transform(Vector3.UnitY, Rotation);
+            }
+        }
         /// <summary>
         /// The euler angle representation of the local rotation
         /// </summary>

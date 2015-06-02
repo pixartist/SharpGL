@@ -10,15 +10,34 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
+    /// <summary>
+    /// The SceneRenderer renders an entire scene to a given target
+    /// </summary>
 	public class SceneRenderer
 	{
 		private Dictionary<Mesh, Dictionary<Material, List<MeshRenderer>>> renderCalls;
 		private int VAO;
 		private App App;
+        /// <summary>
+        /// If true, the renderer will use multisamplers in order to render transparency.
+        /// </summary>
 		public bool UseAlphaToCoverage { get; set; }
+        /// <summary>
+        /// The color of the ambient light
+        /// </summary>
         public Vector3 AmbientLight { get; set; }
+        /// <summary>
+        /// The color of the skylight
+        /// </summary>
         public Vector3 SkylightColor { get; set; }
+        /// <summary>
+        /// The direction of the skylight
+        /// </summary>
         public Vector3 SkylightDirection { get; set; }
+        /// <summary>
+        /// Creates a SceneRenderer
+        /// </summary>
+        /// <param name="app">The app this scenerenderer will run in</param>
 		public SceneRenderer(App app)
 		{
 			this.App = app;
@@ -26,6 +45,10 @@ namespace SharpGL.Drawing
 			VAO = GL.GenVertexArray();
 			UseAlphaToCoverage = true;
 		}
+        /// <summary>
+        /// Adds a renderer component to the SceneRenderer.
+        /// </summary>
+        /// <param name="renderer">The renderer to be added</param>
 		public void AddRenderer(MeshRenderer renderer)
 		{
 			if (renderer != null ? renderer.Mesh != null && renderer.Material != null : false)
@@ -45,6 +68,10 @@ namespace SharpGL.Drawing
 				renderers.Add(renderer);
 			}
 		}
+        /// <summary>
+        /// Removes a renderer component from the SceneRenderer
+        /// </summary>
+        /// <param name="renderer">The renderer to be removed</param>
 		public void RemoveRenderer(MeshRenderer renderer)
 		{
 			if (renderer != null ? renderer.Mesh != null && renderer.Material != null : false)
@@ -60,13 +87,24 @@ namespace SharpGL.Drawing
 				}
 			}
 		}
-
+        /// <summary>
+        /// Renders the scene to a surface
+        /// </summary>
+        /// <param name="camera">The Camera to use</param>
+        /// <param name="surface">The Surface the scene will be rendered to</param>
+        /// <param name="time">The current time</param>
 		public void RenderToSurface(Camera camera, Surface surface, float time)
 		{
 			surface.BindFramebuffer();
 			Render(camera, time);
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 		}
+        /// <summary>
+        /// Renders the the scene to a multisampled buffer. This is required for AlphaToCoverage.
+        /// </summary>
+        /// <param name="camera">The Camera to use</param>
+        /// <param name="surface">The Surface the scene will be rendered to</param>
+        /// <param name="time">The current time</param>
 		public void RenderMultisampled(Camera camera, Surface msBuffer, float time)
 		{
 			msBuffer.Clear();
@@ -85,11 +123,8 @@ namespace SharpGL.Drawing
 				mesh.Key.UpdateBuffers();
 				int elementCount = mesh.Key.ElementCount;
 				if (elementCount > 0)
-				{
-					GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
-					GL.BindVertexArray(VAO);
-					if (mesh.Key.VEO > 0)
-						GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+                {
+					//GL.BindVertexArray(VAO);
 
 					foreach (var mat in mesh.Value)
 					{
@@ -102,7 +137,7 @@ namespace SharpGL.Drawing
                             mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
                             
-							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							mesh.Key.ApplyAttributes(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
@@ -124,6 +159,11 @@ namespace SharpGL.Drawing
 			GL.Disable(EnableCap.Multisample);
 			GL.Disable(EnableCap.SampleAlphaToCoverage);
 		}
+        /// <summary>
+        /// Renders the scene to the screen
+        /// </summary>
+        /// <param name="camera">The camera to use</param>
+        /// <param name="time">The current time</param>
 		public void Render(Camera camera, float time)
 		{
 			camera.App.ResetBlendFunc();
@@ -138,10 +178,9 @@ namespace SharpGL.Drawing
 				int elementCount = mesh.Key.ElementCount;
 				if (elementCount > 0)
 				{
-					GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
-					GL.BindVertexArray(VAO);
-					if (mesh.Key.VEO > 0)
-						GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+					
+					//GL.BindVertexArray(VAO);
+					
 
 					foreach (var mat in mesh.Value)
 					{
@@ -175,7 +214,7 @@ namespace SharpGL.Drawing
                             mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X , AmbientLight.Y , AmbientLight.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
-							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							mesh.Key.ApplyAttributes(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								//Log.Debug("Rendering " + c.GameObject.Name); <- LAG LAG LAG
@@ -206,16 +245,13 @@ namespace SharpGL.Drawing
 					int elementCount = mesh.Key.ElementCount;
 					if (elementCount > 0)
 					{
-						GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
-						GL.BindVertexArray(VAO);
-						if (mesh.Key.VEO > 0)
-							GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+						//GL.BindVertexArray(VAO);
 						foreach (var mat in mesh.Value)
 						{
 							mat.Key.Use();
 							mat.Key.Shader.SetUniform<float>("_time", time);
 							mat.Key.Shader.SetUniform<int>("_samplerCount", mat.Key.Textures.Count);
-							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							mesh.Key.ApplyAttributes(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								c.OnPreDraw();
@@ -247,10 +283,7 @@ namespace SharpGL.Drawing
 					int elementCount = mesh.Key.ElementCount;
 					if (elementCount > 0)
 					{
-						GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.Key.VBO);
-						GL.BindVertexArray(VAO);
-						if (mesh.Key.VEO > 0)
-							GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.Key.VEO);
+						//GL.BindVertexArray(VAO);
 						foreach (var mat in mesh.Value)
 						{
 							mat.Key.Use();
@@ -259,7 +292,7 @@ namespace SharpGL.Drawing
                             mat.Key.Shader.SetUniform<float>("_ambient", AmbientLight.X, AmbientLight.Y, AmbientLight.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightColor", SkylightColor.X, SkylightColor.Y, SkylightColor.Z);
                             mat.Key.Shader.SetUniform<float>("_skylightDirection", SkylightDirection.X, SkylightDirection.Y, SkylightDirection.Z);
-							mesh.Key.ApplyDrawHints(mat.Key.Shader);
+							mesh.Key.ApplyAttributes(mat.Key.Shader);
 							foreach (var c in mat.Value)
 							{
 								c.OnPreDraw();

@@ -8,27 +8,55 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Drawing
 {
+    /// <summary>
+    /// A Surface is based on the Texture2D class. It adds writing functionality by providing a framebuffer.
+    /// </summary>
     public class Surface : Texture2D
     {
         private int fboHandle = -1;
         private int dbHandle = -1;
-		
+        /// <summary>
+        /// Creates an empty Surface with the default Surface format
+        /// </summary>
+        /// <param name="width">Width of the texture in pixels</param>
+        /// <param name="height">Height of the texture in pixels</param>
 		public Surface(int width, int height)
 		{
 			Create(width, height, new SurfaceFormat());
 		}
+        /// <summary>
+        /// Creates a Surface
+        /// </summary>
+        /// <param name="width">Width of the texture in pixels</param>
+        /// <param name="height">Height of the texture in pixels</param>
+        /// <param name="format">The texture format to be used</param>
 		public Surface(int width, int height, SurfaceFormat format)
 		{
 			Create(width, height, format);
 		}
+        /// <summary>
+        /// Loads an image file and creates the texture from it.
+        /// </summary>
+        /// <param name="filePath">The path to the image file</param>
 		public Surface(string filePath)
 		{
 			CreateFromPNG(filePath);
 		}
+        /// <summary>
+        /// Loads an image file and creates the texture from it.
+        /// </summary>
+        /// <param name="filePath">The path to the image file</param>
+        /// <param name="format">The surface format to be used</param>
 		public Surface(string filePath, SurfaceFormat format)
 		{
 			CreateFromPNG(filePath, format);
 		}
+        /// <summary>
+        /// Creates a Surface
+        /// </summary>
+        /// <param name="width">Width of the texture in pixels</param>
+        /// <param name="height">Height of the texture in pixels</param>
+        /// <param name="format">The texture format to be used</param>
 		protected override void Create(int width, int height, SurfaceFormat format)
 		{
 			this.Format = format;
@@ -87,10 +115,19 @@ namespace SharpGL.Drawing
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 			
 		}
+        /// <summary>
+        /// Loads an image file and creates the texture from it.
+        /// </summary>
+        /// <param name="filePath">The path to the image file</param>
 		protected override void CreateFromPNG(string filePath)
 		{
 			CreateFromPNG(filePath, SurfaceFormat.Texture2DAlpha);
 		}
+        /// <summary>
+        /// Loads an image file and creates the texture from it.
+        /// </summary>
+        /// <param name="filePath">The path to the image file</param>
+        /// <param name="format">The surface format to be used</param>
 		protected void CreateFromPNG(string filePath, SurfaceFormat format)
         {
             //check if the file exists
@@ -132,6 +169,10 @@ namespace SharpGL.Drawing
             else
                 Log.Error("Image " + filePath + " not found");
         }
+        /// <summary>
+        /// Clones the content of this Surface to the target Surface
+        /// </summary>
+        /// <param name="target">The target to be cloned to</param>
         public void CloneTo(Surface target)
         {
 
@@ -141,6 +182,14 @@ namespace SharpGL.Drawing
 			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
 			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
         }
+        /// <summary>
+        /// Clones the content of this Surface to the given rectangle on the target Surface
+        /// </summary>
+        /// <param name="target">The target to be cloned to</param>
+        /// <param name="x">X-Coordinate of the target rectangle</param>
+        /// <param name="y">Y-Coordinate of the target rectangle</param>
+        /// <param name="width">Width of the target rectangle</param>
+        /// <param name="height">Height of the target rectangle</param>
 		public void CloneTo(Surface target, int x, int y, int width, int height)
 		{
 			BindFramebuffer(FramebufferTarget.ReadFramebuffer);
@@ -150,12 +199,23 @@ namespace SharpGL.Drawing
 			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
 			
 		}
+        /// <summary>
+        /// Binds this Surface to the framebuffer
+        /// </summary>
+        /// <param name="target">The target slot to bind to</param>
         public void BindFramebuffer(FramebufferTarget target = FramebufferTarget.Framebuffer)
         {
 			if (Format.Multisampling > 1)
 				GL.Enable(EnableCap.Multisample);
             GL.BindFramebuffer(target, fboHandle);
         }
+        /// <summary>
+        /// Clears this Surface with the given color
+        /// </summary>
+        /// <param name="r">Red</param>
+        /// <param name="g">Green</param>
+        /// <param name="b">Blue</param>
+        /// <param name="a">Alpha</param>
         public void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f)
         {
             BindFramebuffer();

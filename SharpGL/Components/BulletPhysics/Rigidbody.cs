@@ -80,6 +80,7 @@ namespace SharpGL.Components.BulletPhysics
         public void SetRigidBody(RigidBodyConstructionInfo info, Vector3 scale)
         {
             Body = new RigidBody(info);
+            Body.UserObject = GameObject;
             Body.CollisionShape.LocalScaling = scale;
             GameObject.App.PhysicsWorld.AddRigidBody(Body);
         }

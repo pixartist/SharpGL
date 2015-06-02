@@ -10,6 +10,9 @@ namespace SharpGL.Drawing
 {
 	public static class Helper
 	{
+        /// <summary>
+        /// Draws a simple quad
+        /// </summary>
 		public static void DrawScreenQuad()
 		{
 			GL.Begin(PrimitiveType.Quads);

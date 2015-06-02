@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Ray.cs" />
     <Compile Include="Components\BulletPhysics\Rigidbody.cs" />
     <Compile Include="Components\BulletPhysics\PlayerControllerFPS.cs" />
     <Compile Include="Components\BulletPhysics\FPSMotionState.cs" />
@@ -141,8 +142,12 @@
     <Compile Include="Drawing\Texture2D.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Shaders\gol.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\normals.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\lit.glsl">

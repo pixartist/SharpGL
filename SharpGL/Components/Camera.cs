@@ -10,6 +10,9 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 namespace SharpGL.Components
 {
+    /// <summary>
+    /// The Camera class implements a virtual, configurable camera.
+    /// </summary>
 	public class Camera : Component
 	{
 		
@@ -19,9 +22,15 @@ namespace SharpGL.Components
 		private float fov;
 		
 		protected Matrix4 projectionMatrix;
+
+        /// <summary>
+        /// If set to true, camera pitch will be locked at -90 & 90 degrees (down & up)
+        /// </summary>
 		public bool PitchLock { get; set; }
 		
-		
+		/// <summary>
+		/// Defines how far the nearplane of the camera is from the camera location
+		/// </summary>
 		public float ZNear
 		{
 			get
@@ -34,7 +43,9 @@ namespace SharpGL.Components
 				SetupProjection();
 			}
 		}
-		
+		/// <summary>
+		/// Defines how far the farplane of the camera is from the camera location
+		/// </summary>
 		public float ZFar
 		{
 			get
@@ -47,7 +58,9 @@ namespace SharpGL.Components
 				SetupProjection();
 			}
 		}
-		
+		/// <summary>
+		/// Defines the horizontal field of view of the camera (in angles)
+		/// </summary>
 		public float Fov
 		{
 			get
@@ -60,6 +73,9 @@ namespace SharpGL.Components
 				SetupProjection();
 			}
 		}
+        /// <summary>
+        /// Returns the size in world coordinates of the nearplane
+        /// </summary>
 		public Vector2 NearplaneSize
 		{
 			get
@@ -68,6 +84,9 @@ namespace SharpGL.Components
 				return new Vector2(h * AspectRatio, h);
 			}
 		}
+        /// <summary>
+        /// Defines the aspect ratio of the camera projection
+        /// </summary>
 		public float AspectRatio { get; private set; }
 		protected override void OnInit()
 		{
@@ -78,6 +97,11 @@ namespace SharpGL.Components
 			SetupProjection();
 			
 		}
+        /// <summary>
+        /// Creates a model-view-projection-matrix for the given transform
+        /// </summary>
+        /// <param name="model">The transform that will be used to construct the matrix</param>
+        /// <returns>A Matrix representing the transformation of the given transform for the current camera view</returns>
 		public Matrix4 GetModelViewProjectionMatrix(Transform model)
 		{
 			Matrix4 m = model.GetMatrix();
@@ -88,7 +112,11 @@ namespace SharpGL.Components
 		
 		
 		
-		
+		/// <summary>
+		/// Rotates the camera along the given axis
+		/// </summary>
+        /// <param name="axis">The axis in global space</param>
+		/// <param name="angle">The angle in radians</param>
 		public void Rotate(Vector3 axis, float angle)
 		{
 			Transform.Rotate(axis, angle);
@@ -110,6 +138,11 @@ namespace SharpGL.Components
 				projectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)((Math.PI * Fov) / 180), AspectRatio, ZNear, ZFar);
 			}
 		}
+        /// <summary>
+        /// Transforms world coordinates to screen coordinates for this camera view
+        /// </summary>
+        /// <param name="world">A point in the world</param>
+        /// <returns>The location of the given point on the screen</returns>
 		public Vector2 WorldToScreen(Vector3 world)
 		{
 			Matrix4 v = Transform.GetMatrix().Inverted();
@@ -126,7 +159,11 @@ namespace SharpGL.Components
 			}
 			return new Vector2(wsv.X * GameObject.App.Window.Width, wsv.Y * GameObject.App.Window.Height);
 		}
-		
+		/// <summary>
+		/// Transforms a screen location into world coordinates
+		/// </summary>
+		/// <param name="screen">A point on the screen</param>
+		/// <returns>A direction vector corresponing to the direction of the given point on the screen</returns>
 		public Vector3 ScreenToDirection(Vector2 screen)
 		{
 			Vector2 ss = new Vector2(GameObject.App.Window.Width, -GameObject.App.Window.Height);
@@ -138,6 +175,11 @@ namespace SharpGL.Components
 			screen *= NearplaneSize.X;
 			return Vector3.Transform(new Vector3(screen.X, screen.Y, -ZNear).Normalized(), Transform.Rotation);
 		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="screen"></param>
+        /// <returns>A point corresponding to the given point on the screen, in world coordinates, with a distance of 1 to the camera location</returns>
 		public Vector3 ScreenToWorld(Vector2 screen)
 		{
 			return GameObject.Transform.LocalPosition + ScreenToDirection(screen);

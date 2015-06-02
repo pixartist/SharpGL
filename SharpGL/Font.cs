@@ -112,52 +112,55 @@ namespace SharpGL
         /// <param name="color">The color to use for drawing.</param>
 		public void DrawString(Surface surface, Shader shader, string text, float charDist, Vector2 basePos, Vector4 color)
 		{
-			float xAt = -1;
-			float yAt = -1;
-			Vector2 texCoord;
-			Vector2 size;
-			Vector2 sizeQ;
-			char[] chars = text.ToCharArray();
-			GL.Enable(EnableCap.Texture2D);
-			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-			GL.BlendEquation(BlendEquationMode.Max);
-			GL.Disable(EnableCap.DepthTest);
-			shader.Use();
-			shader.SetUniform<float>("_color", color.X, color.Y, color.Z, color.W);
-			surface.BindFramebuffer();
-			texture.BindTexture();
-			basePos = new Vector2(basePos.X / (float)surface.Width, basePos.Y / (float)surface.Height);
-			GL.Begin(PrimitiveType.Quads);
-			
-			foreach(var c in chars)
-			{
-				if (charLocations.ContainsKey(c))
-				{
-					Vector2 scale = new Vector2(surface.Width / (float)texture.Width, surface.Height / (float)texture.Height);
-					texCoord = new Vector2(charLocations[c].X / texture.Width, charLocations[c].Y / texture.Height);
-					size = new Vector2(charSizes[c].X / texture.Width, charSizes[c].Y / texture.Height);
-					sizeQ = new Vector2(size.X / scale.X, size.Y / scale.Y) ;
-					GL.TexCoord2(texCoord.X, texCoord.Y + size.Y);
-					GL.Vertex2(basePos.X + xAt, basePos.Y + yAt);
+            if (surface != null)
+            {
+                float xAt = -1;
+                float yAt = -1;
+                Vector2 texCoord;
+                Vector2 size;
+                Vector2 sizeQ;
+                char[] chars = text.ToCharArray();
+                GL.Enable(EnableCap.Texture2D);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                GL.BlendEquation(BlendEquationMode.Max);
+                GL.Disable(EnableCap.DepthTest);
+                shader.Use();
+                shader.SetUniform<float>("_color", color.X, color.Y, color.Z, color.W);
+                surface.BindFramebuffer();
+                texture.BindTexture();
+                basePos = new Vector2(basePos.X / (float)surface.Width, basePos.Y / (float)surface.Height);
+                GL.Begin(PrimitiveType.Quads);
 
-					GL.TexCoord2(texCoord.X + size.X, texCoord.Y + size.Y);
-					GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt);
+                foreach (var c in chars)
+                {
+                    if (charLocations.ContainsKey(c))
+                    {
+                        Vector2 scale = new Vector2(surface.Width / (float)texture.Width, surface.Height / (float)texture.Height);
+                        texCoord = new Vector2(charLocations[c].X / texture.Width, charLocations[c].Y / texture.Height);
+                        size = new Vector2(charSizes[c].X / texture.Width, charSizes[c].Y / texture.Height);
+                        sizeQ = new Vector2(size.X / scale.X, size.Y / scale.Y);
+                        GL.TexCoord2(texCoord.X, texCoord.Y + size.Y);
+                        GL.Vertex2(basePos.X + xAt, basePos.Y + yAt);
 
-					GL.TexCoord2(texCoord.X + size.X, texCoord.Y);
-					GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt + sizeQ.Y);
+                        GL.TexCoord2(texCoord.X + size.X, texCoord.Y + size.Y);
+                        GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt);
 
-					GL.TexCoord2(texCoord.X, texCoord.Y);
-					GL.Vertex2(basePos.X + xAt, basePos.Y + yAt + sizeQ.Y);
+                        GL.TexCoord2(texCoord.X + size.X, texCoord.Y);
+                        GL.Vertex2(basePos.X + xAt + sizeQ.X, basePos.Y + yAt + sizeQ.Y);
+
+                        GL.TexCoord2(texCoord.X, texCoord.Y);
+                        GL.Vertex2(basePos.X + xAt, basePos.Y + yAt + sizeQ.Y);
 
 
-					xAt += sizeQ.X * charDist;
-					//y += sizeQ.Y;
-				}
-			}
-			GL.End();
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-			GL.BindTexture(TextureTarget.Texture2D, 0);
-			GL.UseProgram(0);
+                        xAt += sizeQ.X * charDist;
+                        //y += sizeQ.Y;
+                    }
+                }
+                GL.End();
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.UseProgram(0);
+            }
 		}
 	}
 }

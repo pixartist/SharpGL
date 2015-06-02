@@ -35,15 +35,32 @@ namespace SharpGL
 		/// </summary>
 		public PrimitiveFactory PrimitiveFactory { get; protected set; }
 		/// <summary>
-		/// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
+		/// The Physics engine instance. Use this to interact with physics objects
 		/// </summary>
 		public BulletSharp.DiscreteDynamicsWorld PhysicsWorld { get; protected set; }
+        /// <summary>
+        /// The size of the scene. All objects outside these boundries will be destroyed.
+        /// </summary>
 		public Vector3 WorldSize { get; set; }
+        /// <summary>
+        /// Rendering core. Renders registered MeshRenderers grouped by Mesh -> Material
+        /// </summary>
 		public SceneRenderer SceneRenderer { get; protected set; }
-
+        /// <summary>
+        /// The default source factor for blending
+        /// </summary>
 		public BlendingFactorSrc DefaultBlendFactorSrc { get; set; }
+        /// <summary>
+        /// The default destination factor for blending
+        /// </summary>
 		public BlendingFactorDest DefaultBlendFactorDest { get; set; }
+        /// <summary>
+        /// The current frames per second
+        /// </summary>
 		public float Fps { get; private set; }
+        /// <summary>
+        /// The root object of the scene. All GameObjects are stored within this tree hierarchy.
+        /// </summary>
 		public GameObject SceneRoot { get; private set; }
 		private List<DestructableObject> destroyed;
 		private System.Diagnostics.Stopwatch stopWatch;
@@ -137,13 +154,14 @@ namespace SharpGL
                 new BulletSharp.DbvtBroadphase(), 
                 new BulletSharp.SequentialImpulseConstraintSolver(), 
                 collisionConfig);
-
-
+            
+            Ray.Init(this);
+            
 			Window.Run(60.0);
 			
         }
 
-        void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (PhysicsWorld != null)
                 PhysicsWorld.Dispose();
@@ -242,10 +260,16 @@ namespace SharpGL
 		/// Called every update
 		/// </summary>
         public virtual void OnUpdate() { }
+        /// <summary>
+        /// Called when the application is closing
+        /// </summary>
         public virtual void OnClosing() { }
+        /// <summary>
+        /// Called when drawing. Calls SceneRenderer.Render() by default
+        /// </summary>
+        /// <param name="time"></param>
 		public virtual void OnDraw(float time) 
 		{
-
 			SceneRenderer.Render(ActiveCamera, Time);
 		}
     }

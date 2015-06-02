@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SharpGL.App">
+    <Position X="17" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQBAGAhAAAAAAAAIBDgggwCSIEgQYAEAAgAiAEwAQA=</HashCode>
+      <FileName>App.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.DestructableObject">
+    <Position X="5.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAACAAAAAABAQAAAAAAAAAAgIIA=</HashCode>
+      <FileName>DestructableObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Font">
+    <Position X="22.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIBAAAAAAAAAAAAAAAAAAAwAAAAAAEAAAAAA=</HashCode>
+      <FileName>Font.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.GameObject">
+    <Position X="3" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAIAARAAACAQAQAAAAAQAAEAABAAAAAIAA=</HashCode>
+      <FileName>GameObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Log">
+    <Position X="24" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAACAAEAAAA=</HashCode>
+      <FileName>Log.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Mathf">
+    <Position X="18.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAEQAIAAAAgAAAAAAAEAAAAggUABAAAAAAAABCABAA=</HashCode>
+      <FileName>Mathf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Ray">
+    <Position X="25.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAEAAAAAAAAAAAAAABSAAAEAAAAAAAAACAAgAAAA=</HashCode>
+      <FileName>Ray.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.ShaderParamCollection">
+    <Position X="24" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ShaderParamCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.BulletPhysics.FPSMotionState">
+    <Position X="24" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAgAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Components\BulletPhysics\FPSMotionState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.BulletPhysics.PlayerControllerFPS">
+    <Position X="7.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIBgAAwAAAAAAAAAAAAAAAAEIAAQIQAEEAAEAAAA=</HashCode>
+      <FileName>Components\BulletPhysics\PlayerControllerFPS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.BulletPhysics.RbMotionState">
+    <Position X="18.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAgAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Components\BulletPhysics\RbMotionState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.BulletPhysics.Rigidbody">
+    <Position X="12.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQABQAAgAAAAAAgAAAIBAAgAQAAEBEQCAAAAAAGMEwA=</HashCode>
+      <FileName>Components\BulletPhysics\Rigidbody.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.Camera">
+    <Position X="14.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAUAIAADgAAAQYAgAgCAAAMAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Components\Camera.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.Component">
+    <Position X="9" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAEAQAAAAAAAQAAAACAAMAIAA=</HashCode>
+      <FileName>Components\Component.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.MeshRenderer">
+    <Position X="3.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEABAAAAAAAQEAAAAAAAAAAAgAAAAAQBCcAAAAAIIAA=</HashCode>
+      <FileName>Components\MeshRenderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.PlayerControllerGhost">
+    <Position X="5.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAIAAAAAIAAACAAAAAAAAAAAEAAAQIQAAEAAEEAAA=</HashCode>
+      <FileName>Components\PlayerControllerGhost.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.Extensions">
+    <Position X="20.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEIAAAAAAAQQAAAAAAAAAAIAAAAAQAACAAAI=</HashCode>
+      <FileName>Components\Transform.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Components.Transform">
+    <Position X="10" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBACAAACAAAQAMAwAAIASAAAEAAQQAQAAAGEAACAABI=</HashCode>
+      <FileName>Components\Transform.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Gui">
+    <Position X="3.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQBAAIACAAAAAAAABAAAAAAAAAAAIQBEAAAAAAAIIA=</HashCode>
+      <FileName>Components\Gui.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Canvas">
+    <Position X="18.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAABAAAAAAAAAAAAEAEAAAAAAAAAAAAAABAAIA=</HashCode>
+      <FileName>Drawing\Canvas.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Helper">
+    <Position X="20.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\Helper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Material" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="7" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="SharpGL.Drawing.Material.Texture">
+        <TypeIdentifier>
+          <NewMemberFileName>Drawing\Material.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>QCAAAAAAACAAAABAAAAAAAAAAAAEAAAAAIQAAAAAAAA=</HashCode>
+      <FileName>Drawing\Material.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SharpGL.Drawing.Mesh">
+    <Position X="20.5" Y="5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="SharpGL.Drawing.Mesh.Attribute">
+        <TypeIdentifier>
+          <NewMemberFileName>Drawing\Mesh.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>gABAYEAQAABAAAgAEAAICAEQEAAAAAIAACAAAAAAAAA=</HashCode>
+      <FileName>Drawing\Mesh.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.SceneRenderer">
+    <Position X="17" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAggAEAAAAAAAQAAwAAEAAAAAAAAAABBAAAAigAAA=</HashCode>
+      <FileName>Drawing\SceneRenderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Shader" BaseTypeListCollapsed="true">
+    <Position X="24" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIIAAQACACAESAAAAAAACAAAAAAEAEAAAAADYgEACAA=</HashCode>
+      <FileName>Drawing\Shader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SharpGL.Drawing.Surface">
+    <Position X="0.75" Y="11.75" Width="1.5" />
+    <InheritanceLine Type="SharpGL.Drawing.Texture2D" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="1.25" Y="10.988" />
+        <Point X="1.25" Y="11.375" />
+        <Point X="1.438" Y="11.375" />
+        <Point X="1.438" Y="11.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAIAABACAAAAAAAAAAAgAAAAAAAEEAAAAAAABAAIA=</HashCode>
+      <FileName>Drawing\Surface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.Texture2D">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAABABBCAAhAAAAAAAAEAAAAgAAEEAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\Texture2D.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SharpGL.Drawing.VertexObject">
+    <Position X="25.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAgAAAAAAAgAAAAAAAAAAEAAAAAAAAAAAAAAMAAA=</HashCode>
+      <FileName>Drawing\VertexObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.ShaderParamBase">
+    <Position X="0.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIBAAAAAAAAAAAAQAAAABAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>ShaderParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Drawing.ShaderParam&lt;T&gt;">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ShaderParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Factories.GameObjectFactory">
+    <Position X="18.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAA=</HashCode>
+      <FileName>Factories\GameObjectFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Factories.PrimitiveFactory">
+    <Position X="24" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIAAACAAAA=</HashCode>
+      <FileName>Factories\PrimitiveFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Input.KeyboardHandler">
+    <Position X="22.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgIAAAgAAAAAAAAEAAAAAAAAAAAEAAAACABoAAEA=</HashCode>
+      <FileName>Input\KeyboardHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharpGL.Input.MouseHandler">
+    <Position X="22.25" Y="7.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="SharpGL.Input.MouseHandler.MouseMoveHandler">
+        <TypeIdentifier>
+          <NewMemberFileName>Input\MouseHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ACQAIAAACgIAAgAAEAAAAAAAABCAAAAAAAACAAAAYAA=</HashCode>
+      <FileName>Input\MouseHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="SharpGL.Drawing.AttributeHint">
+    <Position X="18.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAQAAAAAACAAAAAAAAAAIAAAAEAAAAAAAA=</HashCode>
+      <FileName>Drawing\Shader.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SharpGL.Drawing.SurfaceFormat">
+    <Position X="25.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAARgADCAAAAACgAAAQEAAAGAAAACA=</HashCode>
+      <FileName>Drawing\Texture2D.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="SharpGL.Drawing.RenderMode">
+    <Position X="22.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\Material.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
